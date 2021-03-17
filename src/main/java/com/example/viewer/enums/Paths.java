@@ -1,7 +1,7 @@
 package com.example.viewer.enums;
 
 public enum Paths {
-    ALL_REPOSITORIES_PATH("C:/Users/Java/.gitbucket/repositories");
+    ALL_REPOSITORIES_PATH("C:\\repositories");
 
     private String path;
 

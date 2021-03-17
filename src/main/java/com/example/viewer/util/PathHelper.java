@@ -21,7 +21,6 @@ public class PathHelper {
         String relativePath = getRelativePath(path);
         return Arrays.stream(relativePath.split("/")).limit(limit).collect(Collectors.joining("/"));
     }
-
     public static String skipAndLimit(String path, int skip, int limit){
         String relativePath = getRelativePath(path);
         String skipAndLimitedString = Arrays.stream(relativePath.split("/")).skip(skip).limit(limit).collect(Collectors.joining("/"));

@@ -1,12 +1,16 @@
 package com.example.viewer.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.eclipse.jgit.revwalk.RevCommit;
 
+import java.util.ArrayList;
 import java.util.List;
 
+
+@JsonIgnoreProperties(value = { "parentNode" , "revCommit"})
 public class Node {
-    private String name;
-    private List<Node> childNodeList;
+    private String name = "";
+    private List<Node> childNodeList = new ArrayList<>();
     private Node parentNode;
     private RevCommit revCommit;
 

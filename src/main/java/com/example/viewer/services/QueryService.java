@@ -16,16 +16,20 @@ public class QueryService {
         this.nodeCreateService = nodeCreateService;
     }
 
-    public void queryLogic(String user, String fullPath, String query, Map<String, Node> userAndNodeTree) throws IOException, GitAPIException {
-        String[] split = query.split("=");
-        if (split.length >= 2) {
-            String queryType = split[0];
-            String value = split[1];
-            switch (queryType){
-                case "commit":
-                    nodeCreateService.createNodeHierarchy(user, fullPath, Integer.parseInt(value), userAndNodeTree);
-                case "drop":
+    public void queryLogic(String user, String fullPath, String query, Map<String, Node> userAndNodeTree) {
+        try {
+            String[] split = query.split("=");
+            if (split.length >= 2) {
+                String queryType = split[0];
+                String value = split[1];
+                switch (queryType){
+                    case "commit":
+                        nodeCreateService.createNodeHierarchy(user, fullPath, Integer.parseInt(value), userAndNodeTree);
+                    case "drop":
+                }
             }
+        } catch (IOException | GitAPIException e){
+
         }
     }
 

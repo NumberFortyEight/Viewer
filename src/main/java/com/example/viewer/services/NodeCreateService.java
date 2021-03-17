@@ -9,22 +9,61 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class NodeCreateService {
 
     public void createNodeHierarchy(String user, String fullPath, int unixTime, Map<String, Node> userAndNodeTree) throws IOException, GitAPIException {
-        Optional<Node> optionalExistingNodeHierarchy = existNode(user, userAndNodeTree);
+        Optional<Node> optionalExistingNode = existNode(user, userAndNodeTree);
+        String repositoryName = PathHelper.skipAndLimit(fullPath, 1, 1);
+        Node node = new Node();
+        node.setName(repositoryName);
 
-        GetCommitInfo info = new JgitCommits().getInfo(PathHelper.getAbsolutePath(PathHelper.limit(fullPath,2)));
-
+        GetCommitInfo info = new JgitCommits().getInfo(PathHelper.getAbsolutePath(PathHelper.limit(fullPath, 2)));
         RevCommit commitByDate = info.getCommitByDate(unixTime);
-        info.getPathsInTree(fullPath, commitByDate);
+
+        info.getPathsInTree(fullPath, commitByDate)
+                .forEach(path -> nodeSetter( optionalExistingNode.orElse(node), repositoryName + "/" + path));
+
+        System.out.println(node);
     }
 
-    private Optional<Node> existNode(String user, Map<String, Node> userAndNodeTree){
+    private void nodeSetter(Node node, String path) {
+        String[] pathNuggets = path.split("/");
+        if (node.getName().equals(pathNuggets[0])) {
+            if (node.getChildNodeList().isEmpty()) {
+                branchSetter(node, PathHelper.skip(path,1));
+            } else {
+                if (node.getChildNodeList().stream().anyMatch(child -> child.getName().equals(pathNuggets[1]))) {
+                    Optional<Node> optionalChild = node.getChildNodeList().stream().filter(child -> child.getName().equals(pathNuggets[1])).findFirst();
+                    optionalChild.ifPresent(child -> nodeSetter(child, PathHelper.skip(path,1)));
+                } else branchSetter(node, PathHelper.skip(path,1));
+            }
+        } else {
+            branchSetter(node, path);
+        }
+    }
+
+    private void branchSetter(Node fatherNode, String workPath) {
+        String[] pathNuggets = workPath.split("/");
+        if (!pathNuggets[0].equals("")) {
+            Node node = new Node();
+            node.setParentNode(fatherNode);
+            fatherNode.getChildNodeList().add(node);
+            node.setName(pathNuggets[0]);
+            if (pathNuggets.length > 1) {
+                Node childNode = new Node();
+                childNode.setName(pathNuggets[1]);
+                childNode.setParentNode(node);
+                node.getChildNodeList().add(childNode);
+                branchSetter(childNode, PathHelper.skip(workPath, 2));
+            }
+        }
+    }
+
+
+    private Optional<Node> existNode(String user, Map<String, Node> userAndNodeTree) {
         return userAndNodeTree.containsKey(user) ? Optional.ofNullable(userAndNodeTree.get(user)) : Optional.empty();
     }
 }

@@ -40,7 +40,6 @@ public class GetCommitInfo {
     }
 
     public List<String> getPathsInTree(String fullPath, RevCommit targetCommit) throws IOException {
-        String pathToRepository = PathHelper.getAbsolutePath(PathHelper.limit(fullPath, 2));
         String workPath = PathHelper.skip(fullPath,2);
 
         TreeWalk treeWalk = new TreeWalk(git.getRepository());
@@ -51,7 +50,7 @@ public class GetCommitInfo {
         }
         List<String> toLoad = new ArrayList<>();
         while (treeWalk.next()) {
-            toLoad.add(pathToRepository + "/" + treeWalk.getPathString());
+            toLoad.add(treeWalk.getPathString());
         }
         treeWalk.reset();
         return toLoad;
