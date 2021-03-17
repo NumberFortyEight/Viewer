@@ -18,8 +18,12 @@ public class JgitCommits {
 
     public String REPOSITORIES_PATH = Paths.ALL_REPOSITORIES_PATH.getPath();
 
-    public GetCommitInfo getInfo(String pathToRepository) throws IOException {
-        return new GetCommitInfo(Git.open(new File(REPOSITORIES_PATH + "/" + pathToRepository)));
+    public GetCommitInfo getInfo(String pathToRepository) {
+        try {
+            return new GetCommitInfo(Git.open(new File(REPOSITORIES_PATH + "/" + pathToRepository)));
+        } catch (IOException ignored){
+            return null;
+        }
     }
 
 }

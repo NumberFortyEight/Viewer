@@ -16,24 +16,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//@SpringBootApplication
+@SpringBootApplication
 public class ViewerApplication {
 
 	public static void main(String[] args) throws IOException, GitAPIException {
-		//SpringApplication.run(ViewerApplication.class, args);
+		SpringApplication.run(ViewerApplication.class, args);
 
-		List<RevCommit> allCommits = new JgitCommits().getInfo(PathHelper.getRelativePath("/Student1/TestRepository.git/")).getAllCommits();
-		Map<String, Node> userAndNodeTree = new HashMap<>();
+		//List<RevCommit> allCommits = new JgitCommits().getInfo(PathHelper.getRelativePath("/Student1/TestRepository.git/")).getAllCommits();
+		//Map<String, Node> userAndNodeTree = new HashMap<>();
 
-		NodeCreateService nodeCreateService = new NodeCreateService();
+		//NodeCreateService nodeCreateService = new NodeCreateService();
 
-		nodeCreateService.createNodeHierarchy("aaa", PathHelper.getAbsolutePath("/Student1/Task1.git/"), allCommits.stream().findFirst().get().getCommitTime() , userAndNodeTree);
+		//nodeCreateService.createNodeHierarchy("aaa", PathHelper.getAbsolutePath("/Student1/Task1.git/"), allCommits.stream().findFirst().get().getCommitTime() , userAndNodeTree);
 
 //		JgitService jgitService = new JgitService();
 //		RevCommit revCommit = jgitService.targetCommit("/TestRepository.git/html/1111.html", userAndNodeTree.get("aaa"));
 //		System.out.println(revCommit);
 
-		System.out.println(userAndNodeTree);
+//		System.out.println(userAndNodeTree);
 	}
 
 }

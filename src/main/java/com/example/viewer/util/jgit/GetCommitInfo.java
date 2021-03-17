@@ -20,13 +20,17 @@ public class GetCommitInfo {
         this.git = git;
     }
 
-    public List<RevCommit> getAllCommits() throws GitAPIException {
-        Iterator<RevCommit> commitIterator = git.log().call().iterator();
+    public List<RevCommit> getAllCommits(){
         List<RevCommit> revCommitList = new ArrayList<>();
-        while (commitIterator.hasNext()) {
-            revCommitList.add(commitIterator.next());
+        try {
+            Iterator<RevCommit> commitIterator = git.log().call().iterator();
+            while (commitIterator.hasNext()) {
+                revCommitList.add(commitIterator.next());
+            }
+            return revCommitList;
+        } catch (GitAPIException gitAPIException){
+            return revCommitList;
         }
-        return revCommitList;
     }
 
     public RevCommit getCommitByDate(int unixTime) throws GitAPIException {
