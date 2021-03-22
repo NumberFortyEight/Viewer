@@ -47,18 +47,14 @@ public class JgitService {
         String repositoryWithWorkPath = PathHelper.skip(fullPath, 1);
 
         if (optionalNode.isPresent()) {
-            return getTargetCommitInNode(repositoryWithWorkPath, optionalNode.get()).orElse(firstRevCommit);
+            return getTargetCommitInNode(optionalNode.get(), repositoryWithWorkPath).orElse(firstRevCommit);
         } else {
             return firstRevCommit;
         }
     }
 
-    private Optional<RevCommit> getTargetCommitInNode(String repositoryWithWorkPath, Node node) {
-        Optional<Node> commonChild = findCommonChild(node, repositoryWithWorkPath);
-        return Optional.ofNullable(commonChild.get().getRevCommit());
-    }
-
-    private Optional<Node> findCommonChild(Node node, String path) {
+    private Optional<RevCommit> getTargetCommitInNode(Node node, String path) {
+        LOGGER.debug("getTargetCommitInNode input values: " + node.getName() + " " + path );
         String[] pathNuggets = path.split("/");
 
         if (pathNuggets.length > 1) {
@@ -67,37 +63,15 @@ public class JgitService {
                     .filter(childNode -> childNode.getName().equals(pathNuggets[1]))
                     .findFirst();
             if (commonChild.isPresent()) {
-                return findCommonChild(commonChild.get(), PathHelper.skip(path, 1));
-            } else {
-                if (node.getName().equals(pathNuggets[0])) {
-                    return Optional.of(node);
-                } else {
-                    return Optional.empty();
-                }
-            }
-        } else {
-            if (node.getName().equals(pathNuggets[0])) {
-                return Optional.of(node);
-            } else {
-                return Optional.empty();
+                return getTargetCommitInNode(commonChild.get(), PathHelper.skip(path, 1));
             }
         }
-
+        if (node.getName().equals(pathNuggets[0])) {
+            return Optional.of(node.getRevCommit());
+        } else {
+            return Optional.empty();
+        }
     }
-
-//    private RevCommit getTargetCommitInNode(String repositoryWithWorkPath, Node node) {
-//        try {
-//            String[] pathNuggets = PathHelper.getRelativePath(repositoryWithWorkPath).split("/");
-//            if (node.getName().equals(pathNuggets[0])) {
-//                Optional<Node> optionalCommonChild = node.getChildNodeList().stream().filter(childNode -> childNode.getName().equals(pathNuggets[1])).findFirst();
-//                return optionalCommonChild.isPresent() ? getTargetCommitInNode(PathHelper.skip(repositoryWithWorkPath, 1), optionalCommonChild.get()) : node.getRevCommit();
-//            } else {
-//                LOGGER.debug("choose Node - " + node.getName());
-//                return node.getRevCommit();
-//            }
-//        } catch (NullPointerException | ArrayIndexOutOfBoundsException | StringIndexOutOfBoundsException e)
-//
-//    }
 
     private Optional<Node> FindAnExistingNode(String user, Map<String, Node> userAndNodeTree) {
         return userAndNodeTree.containsKey(user) ? Optional.ofNullable(userAndNodeTree.get(user)) : Optional.empty();

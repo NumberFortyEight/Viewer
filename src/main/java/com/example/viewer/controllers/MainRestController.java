@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -52,7 +54,7 @@ public class MainRestController {
     @ResponseStatus(HttpStatus.OK)
     public Object doGetObject(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String user = "One";
-        String fullPath = request.getRequestURI();
+        String fullPath = URLDecoder.decode(request.getRequestURI(), Charset.defaultCharset());
         Optional<String> OptionalQuery = Optional.ofNullable(request.getQueryString());
         OptionalQuery.ifPresent(query -> queryService.queryLogic(user, fullPath, query, userAndNodeTree));
 

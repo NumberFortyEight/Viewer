@@ -3,7 +3,9 @@ package com.example.viewer.services;
 import com.example.viewer.models.Node;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.Map;
@@ -25,11 +27,14 @@ public class QueryService {
                 switch (queryType){
                     case "commit":
                         nodeCreateService.createNodeHierarchy(user, fullPath, Integer.parseInt(value), userAndNodeTree);
+                        break;
                     case "drop":
+                        userAndNodeTree.remove(user);
+                        break;
                 }
             }
         } catch (IOException | GitAPIException e){
-
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request: " + fullPath);
         }
     }
 
