@@ -13,6 +13,7 @@ public class Node {
     private List<Node> childNodeList = new ArrayList<>();
     private Node parentNode;
     private RevCommit revCommit;
+    private int commitTime;
 
     public String getName() {
         return name;
@@ -42,7 +43,16 @@ public class Node {
         return revCommit;
     }
 
+    public int getCommitTime() {
+        return commitTime;
+    }
+
+    public void setCommitTime(int commitTime) {
+        this.commitTime = commitTime;
+    }
+
     public void setRevCommit(RevCommit revCommit) {
         this.revCommit = revCommit;
+        setCommitTime(revCommit.getCommitTime());
     }
 }

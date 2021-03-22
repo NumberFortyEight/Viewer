@@ -2,10 +2,12 @@ package com.example.viewer.services;
 
 import com.example.viewer.models.Node;
 import com.example.viewer.util.PathHelper;
-import com.example.viewer.util.jgit.GetCommitInfo;
-import com.example.viewer.util.jgit.JgitCommits;
+import com.example.viewer.services.jgit.GetCommitInfo;
+import com.example.viewer.services.jgit.JgitCommits;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,8 +16,11 @@ import java.util.*;
 @Service
 public class NodeCreateService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeCreateService.class);
+
     public void createNodeHierarchy(String user, String fullPath, int unixTime, Map<String, Node> userAndNodeTree) throws IOException, GitAPIException {
         Optional<Node> optionalExistingNode = existNode(user, userAndNodeTree);
+        optionalExistingNode.ifPresent(node -> LOGGER.info("Tree exist" + node.getName()));
         String repositoryName = PathHelper.skipAndLimit(fullPath, 1, 1);
 
         Node node = new Node();
@@ -25,9 +30,9 @@ public class NodeCreateService {
         RevCommit commitByDate = info.getCommitByDate(unixTime);
 
         info.getPathsInTree(fullPath, commitByDate)
-                .forEach(path -> nodeSetter(optionalExistingNode.orElse(node), repositoryName + "/" + path));
+                .forEach(path -> setNodeDependency(optionalExistingNode.orElse(node), repositoryName + "/" + path));
 
-        commitSetter(findNodeByPath(optionalExistingNode.orElse(node), PathHelper.skip(fullPath, 1)), commitByDate);
+        setNodeCommits(findNodeByPath(optionalExistingNode.orElse(node), PathHelper.skip(fullPath, 1)), commitByDate);
         userAndNodeTree.put(user, optionalExistingNode.orElse(node));
     }
 
@@ -42,31 +47,31 @@ public class NodeCreateService {
         return node;
     }
 
-    private void commitSetter(Node node, RevCommit revCommit) {
+    private void setNodeCommits(Node node, RevCommit revCommit) {
         node.setRevCommit(revCommit);
         node.getChildNodeList().forEach(child -> {
             child.setRevCommit(revCommit);
-            commitSetter(child, revCommit);
+            setNodeCommits(child, revCommit);
         });
     }
 
-    private void nodeSetter(Node node, String path) {
+    private void setNodeDependency(Node node, String path) {
         String[] pathNuggets = path.split("/");
         if (node.getName().equals(pathNuggets[0])) {
             if (node.getChildNodeList().isEmpty()) {
-                branchSetter(node, PathHelper.skip(path, 1));
+                setNodeBranch(node, PathHelper.skip(path, 1));
             } else {
                 if (node.getChildNodeList().stream().anyMatch(child -> child.getName().equals(pathNuggets[1]))) {
                     Optional<Node> optionalChild = node.getChildNodeList().stream().filter(child -> child.getName().equals(pathNuggets[1])).findFirst();
-                    optionalChild.ifPresent(child -> nodeSetter(child, PathHelper.skip(path, 1)));
-                } else branchSetter(node, PathHelper.skip(path, 1));
+                    optionalChild.ifPresent(child -> setNodeDependency(child, PathHelper.skip(path, 1)));
+                } else setNodeBranch(node, PathHelper.skip(path, 1));
             }
         } else {
-            branchSetter(node, path);
+            setNodeBranch(node, path);
         }
     }
 
-    private void branchSetter(Node fatherNode, String workPath) {
+    private void setNodeBranch(Node fatherNode, String workPath) {
         String[] pathNuggets = workPath.split("/");
         if (!pathNuggets[0].equals("")) {
             Node node = new Node();
@@ -78,7 +83,7 @@ public class NodeCreateService {
                 childNode.setName(pathNuggets[1]);
                 childNode.setParentNode(node);
                 node.getChildNodeList().add(childNode);
-                branchSetter(childNode, PathHelper.skip(workPath, 2));
+                setNodeBranch(childNode, PathHelper.skip(workPath, 2));
             }
         }
     }

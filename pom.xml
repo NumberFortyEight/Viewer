@@ -32,7 +32,16 @@
             <artifactId>org.eclipse.jgit</artifactId>
             <version>5.4.2.201908231537-r</version>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
+        </dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-commons</artifactId>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>

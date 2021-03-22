@@ -1,25 +1,12 @@
 package com.example.viewer;
 
-import com.example.viewer.models.Node;
-import com.example.viewer.services.JgitService;
-import com.example.viewer.services.NodeCreateService;
-import com.example.viewer.util.PathHelper;
-import com.example.viewer.util.jgit.GetCommitInfo;
-import com.example.viewer.util.jgit.JgitCommits;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @SpringBootApplication
 public class ViewerApplication {
 
-	public static void main(String[] args) throws IOException, GitAPIException {
+	public static void main(String[] args){
 		SpringApplication.run(ViewerApplication.class, args);
 
 		//List<RevCommit> allCommits = new JgitCommits().getInfo(PathHelper.getRelativePath("/Student1/TestRepository.git/")).getAllCommits();
