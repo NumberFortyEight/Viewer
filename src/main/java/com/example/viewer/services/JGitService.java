@@ -17,10 +17,10 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class JgitService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NodeCreateService.class);
+public class JGitService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeTreeService.class);
 
-    public ContentModel loadFileOrDirs(String user, String fullPath, Map<String, Node> userAndNodeTree) {
+    public ContentModel getContent(String user, String fullPath, Map<String, Node> userAndNodeTree) {
         try {
             RevCommit revCommit = findCommit(user, fullPath, userAndNodeTree);
             JGitObjectProducer jGitObjectProducer = new JgitCommits().getJGitObject(revCommit, fullPath);

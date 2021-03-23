@@ -1,7 +1,7 @@
 package com.example.viewer.services.jgit;
 
 import com.example.viewer.enums.PathToAllRepositories;
-import com.example.viewer.services.NodeCreateService;
+import com.example.viewer.services.NodeTreeService;
 import com.example.viewer.util.PathHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class JgitCommits {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NodeCreateService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeTreeService.class);
     public String REPOSITORIES_PATH = PathToAllRepositories.ALL_REPOSITORIES_PATH.getPath();
 
     public GetCommitInfo getInfo(String pathToRepository) {

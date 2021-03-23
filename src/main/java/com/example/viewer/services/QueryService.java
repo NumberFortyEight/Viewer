@@ -2,7 +2,6 @@ package com.example.viewer.services;
 
 import com.example.viewer.models.Node;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,10 +11,10 @@ import java.util.Map;
 
 @Service
 public class QueryService {
-    public final NodeCreateService nodeCreateService;
+    public final NodeTreeService nodeTreeService;
 
-    public QueryService(NodeCreateService nodeCreateService) {
-        this.nodeCreateService = nodeCreateService;
+    public QueryService(NodeTreeService nodeTreeService) {
+        this.nodeTreeService = nodeTreeService;
     }
 
     public void queryLogic(String user, String fullPath, String query, Map<String, Node> userAndNodeTree) {
@@ -26,7 +25,7 @@ public class QueryService {
                 String value = split[1];
                 switch (queryType){
                     case "commit":
-                        nodeCreateService.createNodeHierarchy(user, fullPath, Integer.parseInt(value), userAndNodeTree);
+                        nodeTreeService.createNodeHierarchy(user, fullPath, Integer.parseInt(value), userAndNodeTree);
                         break;
                     case "drop":
                         userAndNodeTree.remove(user);

@@ -1,7 +1,7 @@
 package com.example.viewer.services.jgit;
 
 import com.example.viewer.models.CommitModel;
-import com.example.viewer.services.NodeCreateService;
+import com.example.viewer.services.NodeTreeService;
 import com.example.viewer.util.PathHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -17,7 +17,7 @@ import java.util.stream.StreamSupport;
 
 public class GetCommitInfo {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NodeCreateService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeTreeService.class);
 
     private final Git git;
 

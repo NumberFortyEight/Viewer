@@ -2,8 +2,8 @@ package com.example.viewer.controllers;
 
 import com.example.viewer.models.ContentModel;
 import com.example.viewer.models.Node;
-import com.example.viewer.services.JgitService;
-import com.example.viewer.services.NodeCreateService;
+import com.example.viewer.services.JGitService;
+import com.example.viewer.services.NodeTreeService;
 import com.example.viewer.services.QueryService;
 import com.example.viewer.util.PathHelper;
 import com.example.viewer.services.jgit.GetCommitInfo;
@@ -29,12 +29,12 @@ import java.util.Optional;
 public class MainRestController {
 
     private final Map<String, Node> userAndNodeTree = new HashMap<>();
-    public final NodeCreateService nodeCreateService;
+    public final NodeTreeService nodeTreeService;
     public final QueryService queryService;
-    public final JgitService jgitService;
+    public final JGitService jgitService;
 
-    public MainRestController(NodeCreateService nodeCreateService, QueryService queryService, JgitService jgitService) {
-        this.nodeCreateService = nodeCreateService;
+    public MainRestController(NodeTreeService nodeTreeService, QueryService queryService, JGitService jgitService) {
+        this.nodeTreeService = nodeTreeService;
         this.queryService = queryService;
         this.jgitService = jgitService;
     }
@@ -58,10 +58,14 @@ public class MainRestController {
         Optional<String> OptionalQuery = Optional.ofNullable(request.getQueryString());
         OptionalQuery.ifPresent(query -> queryService.queryLogic(user, fullPath, query, userAndNodeTree));
 
-        ContentModel contentModel = jgitService.loadFileOrDirs(user, fullPath, userAndNodeTree);
+        ContentModel contentModel = jgitService.getContent(user, fullPath, userAndNodeTree);
         switch (contentModel.getContentType()){
             case IMAGE:
                 response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+                IOUtils.copy(new ByteArrayInputStream((byte[]) contentModel.getObject()), response.getOutputStream());
+                return null;
+            case VIDEO:
+                response.setContentType("video/mp4");
                 IOUtils.copy(new ByteArrayInputStream((byte[]) contentModel.getObject()), response.getOutputStream());
                 return null;
             default:

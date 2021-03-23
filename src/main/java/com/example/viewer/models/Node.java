@@ -53,6 +53,6 @@ public class Node {
 
     public void setRevCommit(RevCommit revCommit) {
         this.revCommit = revCommit;
-        setCommitTime(revCommit.getCommitTime());
+        this.commitTime = revCommit.getCommitTime();
     }
 }
