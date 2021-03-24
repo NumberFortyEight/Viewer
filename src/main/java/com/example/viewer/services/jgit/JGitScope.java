@@ -1,6 +1,6 @@
 package com.example.viewer.services.jgit;
 
-import com.example.viewer.enums.Paths;
+import com.example.viewer.enums.FoldersPaths;
 import com.example.viewer.util.PathHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class JGitScope {
 
-    public String REPOSITORIES_PATH = Paths.ALL_REPOSITORIES_PATH.getPath();
+    public String REPOSITORIES_PATH = FoldersPaths.ALL_REPOSITORIES_PATH.getPath();
     private final Git git;
 
     public JGitScope(String fullPath) {
