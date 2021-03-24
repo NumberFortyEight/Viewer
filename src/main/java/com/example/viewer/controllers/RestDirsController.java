@@ -1,6 +1,6 @@
 package com.example.viewer.controllers;
 
-import com.example.viewer.enums.PathToAllRepositories;
+import com.example.viewer.enums.Paths;
 import com.example.viewer.models.FileModel;
 import com.example.viewer.services.DirsService;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +12,7 @@ import java.util.Optional;
 @CrossOrigin
 public class RestDirsController {
 
-    public String REPOSITORIES_PATH = PathToAllRepositories.ALL_REPOSITORIES_PATH.getPath();
+    public String REPOSITORIES_PATH = Paths.ALL_REPOSITORIES_PATH.getPath();
 
     private final DirsService dirsService;
 

@@ -1,11 +1,10 @@
 package com.example.viewer.enums;
 
-public enum PathToAllRepositories {
-    ALL_REPOSITORIES_PATH("C:\\Users\\Java\\.gitbucket\\repositories");
-
+public enum Paths {
+    ALL_REPOSITORIES_PATH("C:\\repositories"), TEACHER_PAGE_PATH("C:\\teacherPage");
     private final String path;
 
-    PathToAllRepositories(String path) {
+    Paths(String path) {
         this.path = path;
     }
 

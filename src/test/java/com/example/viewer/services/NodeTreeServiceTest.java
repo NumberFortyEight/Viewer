@@ -14,7 +14,7 @@ class NodeTreeServiceTest {
         NodeTreeService nodeTreeService = new NodeTreeService();
         Node node = new Node();
         node.setName("repository");
-
+/*
         nodeTreeService.setNodeDependency(node, "/repository/label/label");
         nodeTreeService.setNodeDependency(node, "/repository/label/secondLabel/layerTwo");
         nodeTreeService.setNodeDependency(node, "repository/vartex/lible/addon");
@@ -23,6 +23,6 @@ class NodeTreeServiceTest {
         System.out.print(nodeByPath);
         Map<String, Node> userAndNodeTree = new HashMap<>();
         userAndNodeTree.put("aa", node);
-        userAndNodeTree.get("a");
+        userAndNodeTree.get("a");*/
     }
 }

@@ -1,5 +1,6 @@
 package com.example.viewer.services.jgit;
 
+import com.example.viewer.exception.JGitCommitInfoException;
 import com.example.viewer.models.CommitModel;
 import com.example.viewer.services.NodeTreeService;
 import com.example.viewer.util.PathHelper;
@@ -15,13 +16,13 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
-public class GetCommitInfo {
+public class JGitCommitInfo {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NodeTreeService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JGitCommitInfo.class);
 
     private final Git git;
 
-    public GetCommitInfo(Git git) {
+    public JGitCommitInfo(Git git) {
         this.git = git;
     }
 
@@ -45,40 +46,47 @@ public class GetCommitInfo {
                         nextCommit.getAuthorIdent().getName(), String.valueOf(nextCommit.getCommitTime())));
             }
         } catch (GitAPIException gitAPIException){
-            LOGGER.warn("Commits load error ", gitAPIException);
+            LOGGER.warn("Commits model load exception ", gitAPIException);
         }
         return commitModelArrayList;
     }
 
-    public RevCommit getCommitByDate(int unixTime) throws GitAPIException {
-        return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(git.log().call().iterator(), Spliterator.ORDERED),
-                false).filter(revCommit -> revCommit.getCommitTime() == unixTime).findFirst().orElse(findFirstRevCommit());
+    public RevCommit getCommitByDate(int unixTime) {
+        try{
+            return StreamSupport.stream(
+                    Spliterators.spliteratorUnknownSize(git.log().call().iterator(), Spliterator.ORDERED),
+                    false).filter(revCommit -> revCommit.getCommitTime() == unixTime).findFirst().orElse(findFirstRevCommit());
+        } catch (GitAPIException e){
+            throw new JGitCommitInfoException("Commit by date exception", e);
+        }
     }
 
     public RevCommit findFirstRevCommit() {
         try {
             return git.log().call().iterator().next();
-        } catch (GitAPIException gitAPIException){
-            //exception handler
-            return null;
+        } catch (GitAPIException e){
+            throw new JGitCommitInfoException("first commit exception", e);
         }
     }
 
-    public List<String> getPathsInTree(String fullPath, RevCommit targetCommit) throws IOException {
+    public List<String> getPathsInTree(String fullPath, RevCommit targetCommit) {
         String workPath = PathHelper.skip(fullPath,2);
-
-        TreeWalk treeWalk = new TreeWalk(git.getRepository());
-        treeWalk.addTree(targetCommit.getTree());
-        treeWalk.setRecursive(true);
-        if (!workPath.equals("")) {
-            treeWalk.setFilter(PathFilter.create(workPath));
-        }
         List<String> toLoad = new ArrayList<>();
-        while (treeWalk.next()) {
-            toLoad.add(treeWalk.getPathString());
+        try {
+            TreeWalk treeWalk = new TreeWalk(git.getRepository());
+            treeWalk.addTree(targetCommit.getTree());
+            treeWalk.setRecursive(true);
+            if (!workPath.equals("")) {
+                treeWalk.setFilter(PathFilter.create(workPath));
+            }
+            while (treeWalk.next()) {
+                toLoad.add(treeWalk.getPathString());
+            }
+            treeWalk.reset();
+            return toLoad;
+        } catch (IOException e){
+            LOGGER.warn("Empty path", e);
+            return toLoad;
         }
-        treeWalk.reset();
-        return toLoad;
     }
 }

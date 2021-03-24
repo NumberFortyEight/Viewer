@@ -18,22 +18,18 @@ public class QueryService {
     }
 
     public void queryLogic(String user, String fullPath, String query, Map<String, Node> userAndNodeTree) {
-        try {
-            String[] split = query.split("=");
-            if (split.length >= 2) {
-                String queryType = split[0];
-                String value = split[1];
-                switch (queryType){
-                    case "commit":
-                        nodeTreeService.createNodeHierarchy(user, fullPath, Integer.parseInt(value), userAndNodeTree);
-                        break;
-                    case "drop":
-                        userAndNodeTree.remove(user);
-                        break;
-                }
+        String[] split = query.split("=");
+        if (split.length >= 2) {
+            String queryType = split[0];
+            String value = split[1];
+            switch (queryType){
+                case "commit":
+                    nodeTreeService.createNodeHierarchy(user, fullPath, Integer.parseInt(value), userAndNodeTree);
+                    break;
+                case "drop":
+                    userAndNodeTree.remove(user);
+                    break;
             }
-        } catch (IOException | GitAPIException e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request: " + fullPath);
         }
     }
 

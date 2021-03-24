@@ -2,15 +2,13 @@ package com.example.viewer.services;
 
 import com.example.viewer.models.Node;
 import com.example.viewer.util.PathHelper;
-import com.example.viewer.services.jgit.GetCommitInfo;
-import com.example.viewer.services.jgit.JgitCommits;
-import org.eclipse.jgit.api.errors.GitAPIException;
+import com.example.viewer.services.jgit.JGitCommitInfo;
+import com.example.viewer.services.jgit.JGitScope;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -20,12 +18,11 @@ public class NodeTreeService {
 
     public void createNodeHierarchy(String user, String fullPath, int unixTime, Map<String, Node> userAndNodeTree) {
         String repositoryName = PathHelper.skipAndLimit(fullPath, 1, 1);
-        String workPath = PathHelper.getAbsolutePath(PathHelper.limit(fullPath, 2));
         String workPathWithRepository = PathHelper.skip(fullPath, 1);
 
         Node workNode = getExistOrNewNode(user, repositoryName, userAndNodeTree);
 
-        GetCommitInfo info = new JgitCommits().getInfo(workPath);
+        JGitCommitInfo info = new JGitScope(fullPath).getInfo();
         RevCommit commitByDate = info.getCommitByDate(unixTime);
 
         info.getPathsInTree(fullPath, commitByDate)
@@ -33,10 +30,10 @@ public class NodeTreeService {
 
         setCommitToNodeTree(findNodeByPath(workNode, workPathWithRepository).orElse(workNode), commitByDate);
 
-       userAndNodeTree.put(user, workNode);
+        userAndNodeTree.put(user, workNode);
     }
 
-    public Node getExistOrNewNode(String user, String repositoryName, Map<String, Node> userAndNodeTree){
+    private Node getExistOrNewNode(String user, String repositoryName, Map<String, Node> userAndNodeTree) {
         Node existNode = userAndNodeTree.get(user);
         if (existNode != null) {
             String existNodeName = existNode.getName();
@@ -45,8 +42,10 @@ public class NodeTreeService {
 
                 Node node = new Node();
                 node.setName(repositoryName);
+                LOGGER.debug( user + " have exist Node not this repository ");
                 return node;
             } else {
+                LOGGER.debug( user + " have exist Node");
                 return existNode;
             }
         } else {
@@ -56,15 +55,15 @@ public class NodeTreeService {
         }
     }
 
-    //public
-    public void setCommitToNodeTree(Node node, RevCommit revCommit) {
+    private void setCommitToNodeTree(Node node, RevCommit revCommit) {
         node.setRevCommit(revCommit);
         node.getChildNodeList().forEach(child -> {
             child.setRevCommit(revCommit);
             setCommitToNodeTree(child, revCommit);
         });
     }
-    public Optional<Node> findNodeByPath(Node node, String path) {
+
+    private Optional<Node> findNodeByPath(Node node, String path) {
         String[] pathNuggets = PathHelper.getRelativePath(path).split("/");
         if (node.getName().equals(pathNuggets[0])) {
             if (pathNuggets.length > 1) {
@@ -81,17 +80,17 @@ public class NodeTreeService {
         return Optional.empty();
     }
 
-    //public
-    public void setNodeDependency(Node node, String path) {
+    private void setNodeDependency(Node node, String path) {
         String[] pathNuggets = PathHelper.getRelativePath(path).split("/");
         if (node.getName().equals(pathNuggets[0])) {
             if (node.getChildNodeList().isEmpty()) {
-                setNodeBranch(node, PathHelper.skip(path, 1));
+                if(pathNuggets.length > 1) setNodeBranch(node, PathHelper.skip(path, 1));
             } else {
                 Optional<Node> optionalCommonChild = findCommonChild(node, pathNuggets[1]);
 
                 if (optionalCommonChild.isPresent()) {
-                    setNodeDependency(optionalCommonChild.get(), PathHelper.skip(path, 1));
+                    String skip = PathHelper.skip(path, 1);
+                    setNodeDependency(optionalCommonChild.get(), skip);
                 } else {
                     setNodeBranch(node, PathHelper.skip(path, 1));
                 }
@@ -101,8 +100,7 @@ public class NodeTreeService {
         }
     }
 
-    //public
-    public Optional<Node> findCommonChild(Node node, String childName) {
+    private Optional<Node> findCommonChild(Node node, String childName) {
         return node.getChildNodeList()
                 .stream()
                 .filter(child -> child.getName().equals(childName))

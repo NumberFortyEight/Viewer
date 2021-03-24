@@ -1,13 +1,14 @@
 package com.example.viewer.controllers;
 
+import com.example.viewer.models.CommitModel;
 import com.example.viewer.models.ContentModel;
 import com.example.viewer.models.Node;
 import com.example.viewer.services.JGitService;
 import com.example.viewer.services.NodeTreeService;
 import com.example.viewer.services.QueryService;
 import com.example.viewer.util.PathHelper;
-import com.example.viewer.services.jgit.GetCommitInfo;
-import com.example.viewer.services.jgit.JgitCommits;
+import com.example.viewer.services.jgit.JGitCommitInfo;
+import com.example.viewer.services.jgit.JGitScope;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,9 +42,9 @@ public class MainRestController {
     }
 
     @GetMapping("/{student}/{repository}/allCommits")
-    public Object doGetAllCommits(HttpServletRequest request){
-        GetCommitInfo info = new JgitCommits().getInfo(PathHelper.limit(request.getRequestURI(),2));
-        return info.getCommitModelList();
+    public List<CommitModel> doGetAllCommits(HttpServletRequest request){
+        String fullPath = PathHelper.limit(request.getRequestURI(),2);
+        return new JGitScope(fullPath).getInfo().getCommitModelList();
     }
 
     @GetMapping("/committree")
@@ -72,5 +74,4 @@ public class MainRestController {
                 return contentModel.getObject();
         }
     }
-
 }

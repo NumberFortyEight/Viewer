@@ -3,6 +3,7 @@ package com.example.viewer.services.jgit;
 import com.example.viewer.exception.JGitFileLoadException;
 import com.example.viewer.models.FileModel;
 import com.example.viewer.models.FileModelFactory;
+import com.example.viewer.util.PathHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
@@ -22,11 +23,11 @@ public class JGitObjectProducer {
     private final String workPath;
     private final Repository repository;
 
-    public JGitObjectProducer(Git git, RevCommit revCommit, String pathToRepository, String workPath) {
+    public JGitObjectProducer(Git git, RevCommit revCommit, String fullPath) {
         this.repository = git.getRepository();
         this.targetCommit = revCommit;
-        this.pathToRepository = pathToRepository;
-        this.workPath = workPath;
+        this.pathToRepository = PathHelper.getAbsolutePath(PathHelper.limit(fullPath, 2));;
+        this.workPath =  PathHelper.skip(fullPath,2);
         this.treeWalk = new TreeWalk(repository);
     }
 

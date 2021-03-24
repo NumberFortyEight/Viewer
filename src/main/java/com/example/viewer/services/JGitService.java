@@ -4,7 +4,7 @@ import com.example.viewer.enums.ContentType;
 import com.example.viewer.models.ContentModel;
 import com.example.viewer.models.Node;
 import com.example.viewer.services.jgit.JGitObjectProducer;
-import com.example.viewer.services.jgit.JgitCommits;
+import com.example.viewer.services.jgit.JGitScope;
 import com.example.viewer.util.PathHelper;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ public class JGitService {
     public ContentModel getContent(String user, String fullPath, Map<String, Node> userAndNodeTree) {
         try {
             RevCommit revCommit = findCommit(user, fullPath, userAndNodeTree);
-            JGitObjectProducer jGitObjectProducer = new JgitCommits().getJGitObject(revCommit, fullPath);
+            JGitObjectProducer jGitObjectProducer = new JGitScope(fullPath).getObject(revCommit, fullPath);
 
             if (jGitObjectProducer.isThisExist()) {
                 if (jGitObjectProducer.isFile()) {
@@ -42,7 +42,7 @@ public class JGitService {
     }
 
     private RevCommit findCommit(String user, String fullPath, Map<String, Node> userAndNodeTree) {
-        RevCommit firstRevCommit = new JgitCommits().getInfo(PathHelper.getAbsolutePath(PathHelper.limit(fullPath, 2))).findFirstRevCommit();
+        RevCommit firstRevCommit = new JGitScope(fullPath).getInfo().findFirstRevCommit();
         Optional<Node> optionalNode = FindAnExistingNode(user, userAndNodeTree);
         String repositoryWithWorkPath = PathHelper.skip(fullPath, 1);
 

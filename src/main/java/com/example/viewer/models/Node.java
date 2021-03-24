@@ -10,10 +10,10 @@ import java.util.List;
 @JsonIgnoreProperties(value = { "parentNode" , "revCommit"})
 public class Node {
     private String name = "";
+    private int commitTime;
     private List<Node> childNodeList = new ArrayList<>();
     private Node parentNode;
     private RevCommit revCommit;
-    private int commitTime;
 
     public String getName() {
         return name;
