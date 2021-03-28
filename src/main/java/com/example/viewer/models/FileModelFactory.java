@@ -1,7 +1,6 @@
 package com.example.viewer.models;
 
 import com.example.viewer.enums.State;
-import com.example.viewer.models.FileModel;
 import com.example.viewer.util.PathHelper;
 
 import java.io.File;

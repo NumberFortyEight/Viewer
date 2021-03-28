@@ -1,6 +1,8 @@
 package com.example.viewer.services.jgit;
 
+import com.example.viewer.enums.ContentType;
 import com.example.viewer.exception.JGitFileLoadException;
+import com.example.viewer.models.ContentModel;
 import com.example.viewer.models.FileModel;
 import com.example.viewer.models.FileModelFactory;
 import com.example.viewer.util.PathHelper;
@@ -10,6 +12,8 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,8 +30,8 @@ public class JGitObjectProducer {
     public JGitObjectProducer(Git git, RevCommit revCommit, String fullPath) {
         this.repository = git.getRepository();
         this.targetCommit = revCommit;
-        this.pathToRepository = PathHelper.getAbsolutePath(PathHelper.limit(fullPath, 2));;
-        this.workPath =  PathHelper.skip(fullPath,2);
+        this.pathToRepository = PathHelper.getAbsolutePath(PathHelper.limit(fullPath, 2));
+        this.workPath = PathHelper.skip(fullPath, 2);
         this.treeWalk = new TreeWalk(repository);
     }
 
@@ -74,20 +78,62 @@ public class JGitObjectProducer {
         throw new JGitFileLoadException("unknown state");
     }
 
-    public boolean isImage() throws IOException {
+   /*public boolean isImage() throws IOException {
         treeWalk.addTree(targetCommit.getTree());
         treeWalk.setRecursive(true);
         treeWalk.setFilter(PathFilter.create(workPath));
         while (treeWalk.next()) {
             String nameString = treeWalk.getNameString();
             String[] relevant = nameString.split("\\.");
-            treeWalk.reset();
             if (relevant.length >= 2) {
                 return relevant[1].contains("jpg");
             }
-            return false;
         }
+        treeWalk.reset();
         return false;
+    }
+    */
+
+    public ContentType getContentType() throws IOException {
+        treeWalk.addTree(targetCommit.getTree());
+        treeWalk.setRecursive(true);
+        treeWalk.setFilter(PathFilter.create(workPath));
+        while (treeWalk.next()) {
+            String nameString = treeWalk.getNameString();
+            String[] split = nameString.split("\\.");
+            if (split.length >= 2) {
+                String relevant = split[1];
+                treeWalk.reset();
+                switch (relevant){
+                    case ("gif"):
+                    case ("png"):
+                    case ("jpg"):
+                        return ContentType.IMAGE;
+                    case ("mp4"):
+                    case ("avi"):
+                        return ContentType.VIDEO;
+                    default:
+                        return ContentType.BYTES;
+                }
+            }
+        }
+        treeWalk.reset();
+        return ContentType.UNSUPPORTED_FORMAT;
+    }
+
+    public ContentModel getObject(){
+        try {
+            if (isThisExist()) {
+                if (isFile()) {
+                    return new ContentModel(getContentType(), loadFile());
+                } else {
+                    return new ContentModel(ContentType.JSON, getDirs());
+                }
+            }
+        } catch (Exception ignored){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Object not found" + workPath);
+        }
+        return new ContentModel(ContentType.UNSUPPORTED_FORMAT, null);
     }
 
     public byte[] loadFile() throws IOException {
@@ -109,11 +155,9 @@ public class JGitObjectProducer {
         String[] split = workPath.split("/");
         List<FileModel> toLoad = new ArrayList<>();
 
-        FileModelFactory fileModelFactory = new FileModelFactory();
-
         if (workPath.equals("")) {
             while (treeWalk.next()) {
-                toLoad.add(fileModelFactory.createFileModel(
+                toLoad.add(FileModelFactory.createFileModel(
                         treeWalk.isSubtree(),
                         treeWalk.getNameString(),
                         pathToRepository,
@@ -133,7 +177,7 @@ public class JGitObjectProducer {
             }
             while (treeWalk.next()) {
                 if (treeWalk.getPathString().split("/").length > split.length) {
-                    toLoad.add(fileModelFactory.createFileModel(
+                    toLoad.add(FileModelFactory.createFileModel(
                             treeWalk.isSubtree(),
                             treeWalk.getNameString(),
                             pathToRepository,

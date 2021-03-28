@@ -3,17 +3,10 @@ package com.example.viewer.services;
 import com.example.viewer.models.Node;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-
-class NodeTreeServiceTest {
+class CreationOrUpdateNodeTreeServiceTest {
     @Test
     void setNodeBranch() {
-        NodeTreeService nodeTreeService = new NodeTreeService();
-        Node node = new Node();
-        node.setName("repository");
 /*
         nodeTreeService.setNodeDependency(node, "/repository/label/label");
         nodeTreeService.setNodeDependency(node, "/repository/label/secondLabel/layerTwo");

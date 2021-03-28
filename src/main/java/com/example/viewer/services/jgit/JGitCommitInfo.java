@@ -2,16 +2,20 @@ package com.example.viewer.services.jgit;
 
 import com.example.viewer.exception.JGitCommitInfoException;
 import com.example.viewer.models.CommitModel;
-import com.example.viewer.services.NodeTreeService;
 import com.example.viewer.util.PathHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -20,21 +24,37 @@ public class JGitCommitInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JGitCommitInfo.class);
 
-    private final Git git;
+    private Git git;
 
     public JGitCommitInfo(Git git) {
         this.git = git;
     }
 
-    public List<RevCommit> getAllCommits(){
-    List<RevCommit> revCommitList = new ArrayList<>();
+    public List<RevCommit> getAllCommits() {
+        List<RevCommit> revCommitList = new ArrayList<>();
         try {
             for (RevCommit revCommit : git.log().call()) {
                 revCommitList.add(revCommit);
             }
             return revCommitList;
-        } catch (GitAPIException gitAPIException){
+        } catch (GitAPIException gitAPIException) {
             return revCommitList;
+        }
+    }
+
+    public String getDiffOrNull(int unixTime) {
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            try (DiffFormatter diffFormatter = new DiffFormatter(byteArrayOutputStream)) {
+                diffFormatter.setRepository(git.getRepository());
+                for (DiffEntry entry : diffFormatter.scan(getCommitByDate(unixTime), findFirstRevCommit())) {
+                    diffFormatter.format(diffFormatter.toFileHeader(entry));
+                }
+                return byteArrayOutputStream.toString();
+            }
+        } catch (Exception e){
+            LOGGER.warn("Diff Exception", e);
+            return null;
         }
     }
 
@@ -45,18 +65,18 @@ public class JGitCommitInfo {
                 commitModelArrayList.add(new CommitModel(nextCommit.getFullMessage(),
                         nextCommit.getAuthorIdent().getName(), String.valueOf(nextCommit.getCommitTime())));
             }
-        } catch (GitAPIException gitAPIException){
+        } catch (GitAPIException gitAPIException) {
             LOGGER.warn("Commits model load exception ", gitAPIException);
         }
         return commitModelArrayList;
     }
 
     public RevCommit getCommitByDate(int unixTime) {
-        try{
+        try {
             return StreamSupport.stream(
                     Spliterators.spliteratorUnknownSize(git.log().call().iterator(), Spliterator.ORDERED),
                     false).filter(revCommit -> revCommit.getCommitTime() == unixTime).findFirst().orElse(findFirstRevCommit());
-        } catch (GitAPIException e){
+        } catch (GitAPIException e) {
             throw new JGitCommitInfoException("Commit by date exception", e);
         }
     }
@@ -64,13 +84,13 @@ public class JGitCommitInfo {
     public RevCommit findFirstRevCommit() {
         try {
             return git.log().call().iterator().next();
-        } catch (GitAPIException e){
+        } catch (GitAPIException e) {
             throw new JGitCommitInfoException("first commit exception", e);
         }
     }
 
     public List<String> getPathsInTree(String fullPath, RevCommit targetCommit) {
-        String workPath = PathHelper.skip(fullPath,2);
+        String workPath = PathHelper.skip(fullPath, 2);
         List<String> toLoad = new ArrayList<>();
         try {
             TreeWalk treeWalk = new TreeWalk(git.getRepository());
@@ -84,7 +104,7 @@ public class JGitCommitInfo {
             }
             treeWalk.reset();
             return toLoad;
-        } catch (IOException e){
+        } catch (IOException e) {
             LOGGER.warn("Empty path", e);
             return toLoad;
         }

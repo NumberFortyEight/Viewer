@@ -1,5 +1,5 @@
 package com.example.viewer.enums;
 
 public enum ContentType {
-    BYTES, IMAGE, JSON, VIDEO
+    BYTES, IMAGE, JSON, VIDEO, UNSUPPORTED_FORMAT
 }

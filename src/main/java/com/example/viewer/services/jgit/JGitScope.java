@@ -24,11 +24,11 @@ public class JGitScope {
         }
     }
 
-    public JGitCommitInfo getInfo() {
+    public JGitCommitInfo getCommitInfo() {
         return new JGitCommitInfo(git);
     }
 
-    public JGitObjectProducer getObject(RevCommit revCommit, String fullPath) {
+    public JGitObjectProducer getObjectProducer(RevCommit revCommit, String fullPath) {
         return new JGitObjectProducer(git, revCommit, fullPath);
     }
 }

@@ -12,12 +12,12 @@ public class ViewerApplication {
 		//List<RevCommit> allCommits = new JgitCommits().getInfo(PathHelper.getRelativePath("/Student1/TestRepository.git/")).getAllCommits();
 		//Map<String, Node> userAndNodeTree = new HashMap<>();
 
-		//NodeTreeService nodeCreateService = new NodeTreeService();
+		//CreationOrUpdateNodeTreeService nodeCreateService = new CreationOrUpdateNodeTreeService();
 
 		//nodeCreateService.createNodeHierarchy("aaa", PathHelper.getAbsolutePath("/Student1/Task1.git/"), allCommits.stream().findFirst().get().getCommitTime() , userAndNodeTree);
 
-//		JGitService jgitService = new JGitService();
-//		RevCommit revCommit = jgitService.targetCommit("/TestRepository.git/html/1111.html", userAndNodeTree.get("aaa"));
+//		JGitServiceImpl jgitServiceImpl = new JGitServiceImpl();
+//		RevCommit revCommit = jgitServiceImpl.targetCommit("/TestRepository.git/html/1111.html", userAndNodeTree.get("aaa"));
 //		System.out.println(revCommit);
 
 //		System.out.println(userAndNodeTree);

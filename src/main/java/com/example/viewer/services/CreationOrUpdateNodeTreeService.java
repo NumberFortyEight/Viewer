@@ -1,28 +1,31 @@
 package com.example.viewer.services;
 
 import com.example.viewer.models.Node;
+import com.example.viewer.services.interfaces.NodeTreeFinderService;
 import com.example.viewer.util.PathHelper;
 import com.example.viewer.services.jgit.JGitCommitInfo;
 import com.example.viewer.services.jgit.JGitScope;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class NodeTreeService {
+public class CreationOrUpdateNodeTreeService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NodeTreeService.class);
+    public final NodeTreeFinderService nodeTreeFinderService;
+
+    public CreationOrUpdateNodeTreeService(NodeTreeFinderService nodeTreeFinderService) {
+        this.nodeTreeFinderService = nodeTreeFinderService;
+    }
 
     public void createNodeHierarchy(String user, String fullPath, int unixTime, Map<String, Node> userAndNodeTree) {
         String repositoryName = PathHelper.skipAndLimit(fullPath, 1, 1);
         String workPathWithRepository = PathHelper.skip(fullPath, 1);
 
-        Node workNode = getExistOrNewNode(user, repositoryName, userAndNodeTree);
+        Node workNode = nodeTreeFinderService.getExistOrNewNode(user, repositoryName, userAndNodeTree);
 
-        JGitCommitInfo info = new JGitScope(fullPath).getInfo();
+        JGitCommitInfo info = new JGitScope(fullPath).getCommitInfo();
         RevCommit commitByDate = info.getCommitByDate(unixTime);
 
         info.getPathsInTree(fullPath, commitByDate)
@@ -33,7 +36,7 @@ public class NodeTreeService {
         userAndNodeTree.put(user, workNode);
     }
 
-    private Node getExistOrNewNode(String user, String repositoryName, Map<String, Node> userAndNodeTree) {
+    /*private Node getExistOrNewNode(String user, String repositoryName, Map<String, Node> userAndNodeTree) {
         Node existNode = userAndNodeTree.get(user);
         if (existNode != null) {
             String existNodeName = existNode.getName();
@@ -54,6 +57,7 @@ public class NodeTreeService {
             return node;
         }
     }
+*/
 
     private void setCommitToNodeTree(Node node, RevCommit revCommit) {
         node.setRevCommit(revCommit);
