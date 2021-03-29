@@ -36,29 +36,6 @@ public class CreationOrUpdateNodeTreeService {
         userAndNodeTree.put(user, workNode);
     }
 
-    /*private Node getExistOrNewNode(String user, String repositoryName, Map<String, Node> userAndNodeTree) {
-        Node existNode = userAndNodeTree.get(user);
-        if (existNode != null) {
-            String existNodeName = existNode.getName();
-            if (!existNodeName.equals(repositoryName)) {
-                userAndNodeTree.remove(user);
-
-                Node node = new Node();
-                node.setName(repositoryName);
-                LOGGER.debug( user + " have exist Node not this repository ");
-                return node;
-            } else {
-                LOGGER.debug( user + " have exist Node");
-                return existNode;
-            }
-        } else {
-            Node node = new Node();
-            node.setName(repositoryName);
-            return node;
-        }
-    }
-*/
-
     private void setCommitToNodeTree(Node node, RevCommit revCommit) {
         node.setRevCommit(revCommit);
         node.getChildNodeList().forEach(child -> {

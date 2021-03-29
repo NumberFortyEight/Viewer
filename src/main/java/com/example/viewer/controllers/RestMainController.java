@@ -25,25 +25,18 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@ResponseBody
 @CrossOrigin
-public class MainRestController {
+public class RestMainController {
 
     private final Map<String, Node> userAndNodeTree = new HashMap<>();
     public final CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService;
     public final QueryService queryService;
     public final JGitService jgitService;
 
-    public MainRestController(CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService, QueryService queryService, JGitService jgitService) {
+    public RestMainController(CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService, QueryService queryService, JGitService jgitService) {
         this.creationOrUpdateNodeTreeService = creationOrUpdateNodeTreeService;
         this.queryService = queryService;
         this.jgitService = jgitService;
-    }
-
-    @GetMapping("/{student}/{repository}/allCommits")
-    public List<CommitModel> doGetAllCommits(HttpServletRequest request){
-        String fullPath = PathHelper.limit(request.getRequestURI(),2);
-        return new JGitScope(fullPath).getCommitInfo().getCommitModelList();
     }
 
     @GetMapping("/committree")
@@ -51,11 +44,11 @@ public class MainRestController {
         return userAndNodeTree;
     }
 
-    @GetMapping("/{student}/{repository}/**")
+    @GetMapping("api/{student}/{repository}/**")
     @ResponseStatus(HttpStatus.OK)
-    public Object getObject(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public Object mainJGitApi(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String user = "One";
-        String fullPath = URLDecoder.decode(request.getRequestURI(), Charset.defaultCharset());
+        String fullPath = PathHelper.getAbsolutePath(PathHelper.skip(URLDecoder.decode(request.getRequestURI(), Charset.defaultCharset()), 1));
         Optional<String> OptionalQuery = Optional.ofNullable(request.getQueryString());
         OptionalQuery.ifPresent(query -> queryService.queryLogic(user, fullPath, query, userAndNodeTree));
 
