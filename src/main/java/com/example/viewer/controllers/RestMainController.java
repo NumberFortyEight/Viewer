@@ -1,13 +1,11 @@
 package com.example.viewer.controllers;
 
-import com.example.viewer.models.CommitModel;
 import com.example.viewer.models.ContentModel;
 import com.example.viewer.models.Node;
 import com.example.viewer.services.CreationOrUpdateNodeTreeService;
-import com.example.viewer.services.QueryService;
+import com.example.viewer.services.MainQueryService;
 import com.example.viewer.services.interfaces.JGitService;
 import com.example.viewer.util.PathHelper;
-import com.example.viewer.services.jgit.JGitScope;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,7 +18,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,12 +27,12 @@ public class RestMainController {
 
     private final Map<String, Node> userAndNodeTree = new HashMap<>();
     public final CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService;
-    public final QueryService queryService;
+    public final MainQueryService mainQueryService;
     public final JGitService jgitService;
 
-    public RestMainController(CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService, QueryService queryService, JGitService jgitService) {
+    public RestMainController(CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService, MainQueryService mainQueryService, JGitService jgitService) {
         this.creationOrUpdateNodeTreeService = creationOrUpdateNodeTreeService;
-        this.queryService = queryService;
+        this.mainQueryService = mainQueryService;
         this.jgitService = jgitService;
     }
 
@@ -50,7 +47,7 @@ public class RestMainController {
         String user = "One";
         String fullPath = PathHelper.getAbsolutePath(PathHelper.skip(URLDecoder.decode(request.getRequestURI(), Charset.defaultCharset()), 1));
         Optional<String> OptionalQuery = Optional.ofNullable(request.getQueryString());
-        OptionalQuery.ifPresent(query -> queryService.queryLogic(user, fullPath, query, userAndNodeTree));
+        OptionalQuery.ifPresent(query -> mainQueryService.queryLogic(user, fullPath, query, userAndNodeTree));
 
         ContentModel contentModel = jgitService.getContent(user, fullPath, userAndNodeTree);
         switch (contentModel.getContentType()){

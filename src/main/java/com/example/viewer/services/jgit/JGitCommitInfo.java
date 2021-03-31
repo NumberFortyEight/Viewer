@@ -14,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -45,11 +43,16 @@ public class JGitCommitInfo {
     public String getDiffOrNull(int unixTime) {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
             try (DiffFormatter diffFormatter = new DiffFormatter(byteArrayOutputStream)) {
                 diffFormatter.setRepository(git.getRepository());
-                for (DiffEntry entry : diffFormatter.scan(getCommitByDate(unixTime), findFirstRevCommit())) {
+                Optional<RevCommit> optionalParentCommit = getAllCommits().stream()
+                        .filter(revCommit -> revCommit.getCommitTime() < unixTime)
+                        .findFirst();
+                for (DiffEntry entry : diffFormatter.scan(getCommitByDate(unixTime), optionalParentCommit.orElse(findFirstRevCommit()))) {
                     diffFormatter.format(diffFormatter.toFileHeader(entry));
                 }
+                System.out.println(byteArrayOutputStream);
                 return byteArrayOutputStream.toString();
             }
         } catch (Exception e){

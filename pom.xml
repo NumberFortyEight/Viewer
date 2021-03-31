@@ -52,7 +52,20 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+
+			<dependency>
+				<groupId>io.reflectoring.diffparser</groupId>
+				<artifactId>diffparser</artifactId>
+				<version>1.4</version>
+			</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jcenter</id>
+			<url>https://jcenter.bintray.com/</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>

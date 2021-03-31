@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-public class QueryService {
+public class MainQueryService {
     public final CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService;
 
-    public QueryService(CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService) {
+    public MainQueryService(CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService) {
         this.creationOrUpdateNodeTreeService = creationOrUpdateNodeTreeService;
     }
 
@@ -26,8 +26,6 @@ public class QueryService {
                 case "drop":
                     userAndNodeTree.remove(user);
                     break;
-                case "diff":
-                    new JGitScope(fullPath).getCommitInfo().getDiffOrNull(Integer.parseInt(value));
             }
         }
     }

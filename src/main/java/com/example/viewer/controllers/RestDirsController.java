@@ -20,7 +20,7 @@ public class RestDirsController {
         this.dirsService = dirsService;
     }
 
-    @GetMapping(value = { "api/", "api/{student}"})
+    @GetMapping(value = { "api", "api/{student}"})
     @ResponseBody
     public List<FileModel> getDirectory(@PathVariable Optional<String> student) {
         String url = student.map(existStudent -> "/" + existStudent).orElse("/");
