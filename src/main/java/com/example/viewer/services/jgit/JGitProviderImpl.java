@@ -1,5 +1,7 @@
 package com.example.viewer.services.jgit;
 
+import com.example.viewer.exception.JGitException;
+import com.example.viewer.exception.JGitOpenException;
 import com.example.viewer.services.interfaces.JGitProvider;
 import com.example.viewer.util.PathHelper;
 import org.eclipse.jgit.api.Git;
@@ -14,7 +16,7 @@ import java.io.IOException;
 
 public class JGitProviderImpl implements JGitProvider {
 
-    @Value("path.to.all.repositories")
+    @Value("${path.to.repositories}")
     private String REPOSITORIES_PATH;
 
     public Git getConnection(String fullPath) {
@@ -22,7 +24,7 @@ public class JGitProviderImpl implements JGitProvider {
         try {
             return Git.open(new File(REPOSITORIES_PATH + "/" + pathToRepository));
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Git not found:" + pathToRepository);
+            throw new JGitOpenException( "Git not found:" + pathToRepository, e);
         }
     }
 

@@ -26,7 +26,8 @@ public class JGitCommitInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(JGitCommitInfo.class);
     private final Git git;
 
-    public JGitCommitInfo(String fullPath, JGitProvider jGitProvider) {
+    public JGitCommitInfo(String fullPath, ApplicationContext appContext) {
+        JGitProvider jGitProvider = appContext.getBean(JGitProvider.class);
         this.git = jGitProvider.getConnection(fullPath);
     }
 

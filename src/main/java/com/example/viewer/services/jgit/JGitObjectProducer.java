@@ -31,8 +31,8 @@ public class JGitObjectProducer {
     private final String workPath;
     private final Repository repository;
 
-    public JGitObjectProducer(RevCommit revCommit, String fullPath, JGitProvider jGitProvider) {
-        Git git = jGitProvider.getConnection(fullPath);
+    public JGitObjectProducer(RevCommit revCommit, String fullPath, ApplicationContext appContext) {
+        Git git = appContext.getBean(JGitProvider.class).getConnection(fullPath);
         this.repository = git.getRepository();
         this.targetCommit = revCommit;
         this.pathToRepository = PathHelper.getAbsolutePath(PathHelper.limit(fullPath, 2));
