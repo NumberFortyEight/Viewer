@@ -2,6 +2,7 @@ package com.example.viewer.services.jgit;
 
 import com.example.viewer.exception.JGitCommitInfoException;
 import com.example.viewer.models.CommitModel;
+import com.example.viewer.services.interfaces.JGitProvider;
 import com.example.viewer.util.PathHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -12,6 +13,9 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,13 +23,11 @@ import java.util.*;
 import java.util.stream.StreamSupport;
 
 public class JGitCommitInfo {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JGitCommitInfo.class);
+    private final Git git;
 
-    private Git git;
-
-    public JGitCommitInfo(Git git) {
-        this.git = git;
+    public JGitCommitInfo(String fullPath, JGitProvider jGitProvider) {
+        this.git = jGitProvider.getConnection(fullPath);
     }
 
     public List<RevCommit> getAllCommits() {

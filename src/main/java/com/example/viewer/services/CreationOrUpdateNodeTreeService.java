@@ -4,20 +4,19 @@ import com.example.viewer.models.Node;
 import com.example.viewer.services.interfaces.NodeTreeFinderService;
 import com.example.viewer.util.PathHelper;
 import com.example.viewer.services.jgit.JGitCommitInfo;
-import com.example.viewer.services.jgit.JGitScope;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class CreationOrUpdateNodeTreeService {
 
     public final NodeTreeFinderService nodeTreeFinderService;
-
-    public CreationOrUpdateNodeTreeService(NodeTreeFinderService nodeTreeFinderService) {
-        this.nodeTreeFinderService = nodeTreeFinderService;
-    }
+    private final ApplicationContext appContext;
 
     public void createNodeHierarchy(String user, String fullPath, int unixTime, Map<String, Node> userAndNodeTree) {
         String repositoryName = PathHelper.skipAndLimit(fullPath, 1, 1);
@@ -25,7 +24,8 @@ public class CreationOrUpdateNodeTreeService {
 
         Node workNode = nodeTreeFinderService.getExistOrNewNode(user, repositoryName, userAndNodeTree);
 
-        JGitCommitInfo info = new JGitScope(fullPath).getCommitInfo();
+        JGitCommitInfo info = appContext.getBean(JGitCommitInfo.class, fullPath);
+
         RevCommit commitByDate = info.getCommitByDate(unixTime);
 
         info.getPathsInTree(fullPath, commitByDate)

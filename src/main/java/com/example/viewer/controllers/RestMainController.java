@@ -6,6 +6,7 @@ import com.example.viewer.services.CreationOrUpdateNodeTreeService;
 import com.example.viewer.services.MainQueryService;
 import com.example.viewer.services.interfaces.JGitService;
 import com.example.viewer.util.PathHelper;
+import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,18 +24,13 @@ import java.util.Optional;
 
 @RestController
 @CrossOrigin
+@RequiredArgsConstructor
 public class RestMainController {
 
     private final Map<String, Node> userAndNodeTree = new HashMap<>();
     public final CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService;
     public final MainQueryService mainQueryService;
     public final JGitService jgitService;
-
-    public RestMainController(CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService, MainQueryService mainQueryService, JGitService jgitService) {
-        this.creationOrUpdateNodeTreeService = creationOrUpdateNodeTreeService;
-        this.mainQueryService = mainQueryService;
-        this.jgitService = jgitService;
-    }
 
     @GetMapping("/committree")
     public Map<String, Node> getUserAndNodeTree(){

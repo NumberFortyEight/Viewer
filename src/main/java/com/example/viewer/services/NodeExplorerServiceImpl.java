@@ -3,26 +3,28 @@ package com.example.viewer.services;
 import com.example.viewer.models.Node;
 import com.example.viewer.services.interfaces.NodeExplorerService;
 import com.example.viewer.services.interfaces.NodeTreeFinderService;
-import com.example.viewer.services.jgit.JGitScope;
+import com.example.viewer.services.jgit.JGitCommitInfo;
 import com.example.viewer.util.PathHelper;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class NodeExplorerServiceImpl implements NodeExplorerService {
 
     public final NodeTreeFinderService nodeTreeFinderService;
-
-    public NodeExplorerServiceImpl(NodeTreeFinderService nodeTreeFinderService) {
-        this.nodeTreeFinderService = nodeTreeFinderService;
-    }
+    private final ApplicationContext appContext;
 
     @Override
     public RevCommit findCommitInNodeTreeByPath(String username, String fullPath, Map<String, Node> userAndNodeTree) {
-        RevCommit firstRevCommit = new JGitScope(fullPath).getCommitInfo().findFirstRevCommit();
+
+        RevCommit firstRevCommit = appContext.getBean(JGitCommitInfo.class, fullPath).findFirstRevCommit();
+
         Optional<Node> optionalNode = nodeTreeFinderService.getOptionalNodeTreeByUsername(username, userAndNodeTree);
         String repositoryWithWorkPath = PathHelper.skip(fullPath, 1);
 

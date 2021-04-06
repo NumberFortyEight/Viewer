@@ -5,6 +5,7 @@ import com.example.viewer.exception.JGitFileLoadException;
 import com.example.viewer.models.ContentModel;
 import com.example.viewer.models.FileModel;
 import com.example.viewer.models.FileModelFactory;
+import com.example.viewer.services.interfaces.JGitProvider;
 import com.example.viewer.util.PathHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectReader;
@@ -12,7 +13,10 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -27,7 +31,8 @@ public class JGitObjectProducer {
     private final String workPath;
     private final Repository repository;
 
-    public JGitObjectProducer(Git git, RevCommit revCommit, String fullPath) {
+    public JGitObjectProducer(RevCommit revCommit, String fullPath, JGitProvider jGitProvider) {
+        Git git = jGitProvider.getConnection(fullPath);
         this.repository = git.getRepository();
         this.targetCommit = revCommit;
         this.pathToRepository = PathHelper.getAbsolutePath(PathHelper.limit(fullPath, 2));
@@ -77,22 +82,6 @@ public class JGitObjectProducer {
         }
         throw new JGitFileLoadException("unknown state");
     }
-
-   /*public boolean isImage() throws IOException {
-        treeWalk.addTree(targetCommit.getTree());
-        treeWalk.setRecursive(true);
-        treeWalk.setFilter(PathFilter.create(workPath));
-        while (treeWalk.next()) {
-            String nameString = treeWalk.getNameString();
-            String[] relevant = nameString.split("\\.");
-            if (relevant.length >= 2) {
-                return relevant[1].contains("jpg");
-            }
-        }
-        treeWalk.reset();
-        return false;
-    }
-    */
 
     public ContentType getContentType() throws IOException {
         treeWalk.addTree(targetCommit.getTree());

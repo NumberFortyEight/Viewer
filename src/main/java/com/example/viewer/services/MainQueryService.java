@@ -1,18 +1,15 @@
 package com.example.viewer.services;
 
 import com.example.viewer.models.Node;
-import com.example.viewer.services.jgit.JGitScope;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class MainQueryService {
     public final CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService;
-
-    public MainQueryService(CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService) {
-        this.creationOrUpdateNodeTreeService = creationOrUpdateNodeTreeService;
-    }
 
     public void queryLogic(String user, String fullPath, String query, Map<String, Node> userAndNodeTree) {
         String[] split = query.split("=");
