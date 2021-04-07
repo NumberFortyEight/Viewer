@@ -1,4 +1,4 @@
-package com.example.viewer.models;
+package com.example.viewer.dataClasses;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.eclipse.jgit.revwalk.RevCommit;

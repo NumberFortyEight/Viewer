@@ -1,15 +1,14 @@
-package com.example.viewer.models;
+package com.example.viewer.dataClasses;
 
-import com.example.viewer.models.CommitModel;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class RevCommitPacker {
-    public static List<CommitModel> getCommitModelListOfListRevCommit(List<RevCommit> revCommitList){
+    public static List<Commit> getCommitModelListOfListRevCommit(List<RevCommit> revCommitList){
         return revCommitList.stream().map(revCommit ->
-                new CommitModel(revCommit.getFullMessage(),
+                new Commit(revCommit.getFullMessage(),
                     revCommit.getAuthorIdent().getName(), String.valueOf(revCommit.getCommitTime())))
                 .collect(Collectors.toList()) ;
     }

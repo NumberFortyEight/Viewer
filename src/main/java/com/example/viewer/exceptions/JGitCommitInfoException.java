@@ -1,4 +1,4 @@
-package com.example.viewer.exception;
+package com.example.viewer.exceptions;
 
 public class JGitCommitInfoException extends RuntimeException {
     public JGitCommitInfoException(String errorMessage, Throwable throwable) {

@@ -1,6 +1,6 @@
 package com.example.viewer.services.nodes;
 
-import com.example.viewer.models.Node;
+import com.example.viewer.dataClasses.Node;
 import com.example.viewer.services.interfaces.NodeTreeFinderService;
 import org.springframework.stereotype.Service;
 

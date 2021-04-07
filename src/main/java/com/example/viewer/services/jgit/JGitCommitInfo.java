@@ -1,7 +1,7 @@
 package com.example.viewer.services.jgit;
 
-import com.example.viewer.models.CommitModel;
-import com.example.viewer.models.RevCommitPacker;
+import com.example.viewer.dataClasses.Commit;
+import com.example.viewer.dataClasses.RevCommitPacker;
 import com.example.viewer.services.interfaces.JGitProvider;
 import com.example.viewer.util.PathHelper;
 import lombok.NonNull;
@@ -15,8 +15,6 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
@@ -35,7 +33,7 @@ public class JGitCommitInfo {
         this.git = jGitProvider.getConnection(fullPath);
     }
 
-    public List<CommitModel> getAllCommitsModelList() throws GitAPIException {
+    public List<Commit> getAllCommitsModelList() throws GitAPIException {
         return RevCommitPacker.getCommitModelListOfListRevCommit(getAllCommits());
     }
 
@@ -53,7 +51,7 @@ public class JGitCommitInfo {
         return git.log().call().iterator().next();
     }
 
-    public List<CommitModel> getCommitsByFullPath(String fullPath) throws Exception {
+    public List<Commit> getCommitsByFullPath(String fullPath) throws Exception {
         String workPath = PathHelper.skip(fullPath, 2);
         if (workPath.equals("") || workPath.equals("/")) {
             return getAllCommitsModelList();

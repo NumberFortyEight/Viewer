@@ -1,7 +1,6 @@
 package com.example.viewer.services.interfaces;
 
-import com.example.viewer.models.Node;
-import com.example.viewer.services.jgit.JGitObjectProducer;
+import com.example.viewer.dataClasses.Node;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Map;

@@ -1,11 +1,11 @@
-package com.example.viewer.models;
+package com.example.viewer.dataClasses;
 
 import com.example.viewer.enums.State;
 import com.example.viewer.util.PathHelper;
 
 import java.io.File;
 
-public class FileModelFactory {
+public class FileFactory {
     public static FileModel createFileModel(Boolean isFolder, String fileName, String pathToRepository, String PathString){
         State state = isFolder ? State.FOLDER : State.FILE;
         String fullPath = PathHelper.getAbsolutePath(pathToRepository) + PathHelper.getAbsolutePath(PathString);

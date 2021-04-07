@@ -1,7 +1,7 @@
 package com.example.viewer.services;
 
-import com.example.viewer.exception.JGitCommitInfoException;
-import com.example.viewer.models.CommitModel;
+import com.example.viewer.exceptions.JGitCommitInfoException;
+import com.example.viewer.dataClasses.Commit;
 import com.example.viewer.services.interfaces.CommitService;
 import com.example.viewer.services.jgit.JGitCommitInfo;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ public class CommitServiceImpl implements CommitService {
     private final ApplicationContext appContext;
 
     @Override
-    public List<CommitModel> getAllCommits(String fullPath) {
+    public List<Commit> getAllCommits(String fullPath) {
         try {
             JGitCommitInfo jGitCommitInfo = appContext.getBean(JGitCommitInfo.class);
             jGitCommitInfo.setGitByPath(fullPath);
@@ -29,7 +29,7 @@ public class CommitServiceImpl implements CommitService {
     }
 
     @Override
-    public List<CommitModel> getCommitsByPath(String fullPath) {
+    public List<Commit> getCommitsByPath(String fullPath) {
         try {
             JGitCommitInfo jGitCommitInfo = appContext.getBean(JGitCommitInfo.class);
             jGitCommitInfo.setGitByPath(fullPath);

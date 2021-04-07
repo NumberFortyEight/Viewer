@@ -1,4 +1,4 @@
-package com.example.viewer.exception;
+package com.example.viewer.exceptions;
 
 public class JGitFileLoadException extends Exception {
     public JGitFileLoadException(String errorMessage, Throwable throwable) {

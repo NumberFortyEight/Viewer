@@ -1,4 +1,4 @@
-package com.example.viewer.exception;
+package com.example.viewer.exceptions;
 
 public class DirsLookupException extends RuntimeException {
     public DirsLookupException(String errorMessage, Throwable throwable) {

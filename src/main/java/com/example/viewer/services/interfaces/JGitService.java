@@ -1,10 +1,10 @@
 package com.example.viewer.services.interfaces;
 
-import com.example.viewer.models.ContentModel;
-import com.example.viewer.models.Node;
+import com.example.viewer.dataClasses.Content;
+import com.example.viewer.dataClasses.Node;
 
 import java.util.Map;
 
 public interface JGitService {
-    ContentModel getContent(String user, String fullPath, Map<String, Node> userAndNodeTree);
+    Content getContent(String user, String fullPath, Map<String, Node> userAndNodeTree);
 }

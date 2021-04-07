@@ -1,10 +1,10 @@
 package com.example.viewer.services.jgit;
 
 import com.example.viewer.enums.ContentType;
-import com.example.viewer.exception.JGitFileLoadException;
-import com.example.viewer.models.ContentModel;
-import com.example.viewer.models.FileModel;
-import com.example.viewer.models.FileModelFactory;
+import com.example.viewer.exceptions.JGitFileLoadException;
+import com.example.viewer.dataClasses.Content;
+import com.example.viewer.dataClasses.FileModel;
+import com.example.viewer.dataClasses.FileFactory;
 import com.example.viewer.services.interfaces.JGitProvider;
 import com.example.viewer.util.PathHelper;
 import lombok.NonNull;
@@ -109,15 +109,15 @@ public class JGitObjectProducer {
         return ContentType.UNSUPPORTED_FORMAT;
     }
 
-    public ContentModel getObject() throws Exception {
+    public Content getObject() throws Exception {
         if (isThisExist()) {
             if (isFile()) {
-                return new ContentModel(getContentType(), loadFile());
+                return new Content(getContentType(), loadFile());
             } else {
-                return new ContentModel(ContentType.JSON, getDirs());
+                return new Content(ContentType.JSON, getDirs());
             }
         } else {
-            return new ContentModel(ContentType.UNSUPPORTED_FORMAT, null);
+            return new Content(ContentType.UNSUPPORTED_FORMAT, null);
         }
     }
 
@@ -142,7 +142,7 @@ public class JGitObjectProducer {
 
         if (workPath.equals("")) {
             while (treeWalk.next()) {
-                toLoad.add(FileModelFactory.createFileModel(
+                toLoad.add(FileFactory.createFileModel(
                         treeWalk.isSubtree(),
                         treeWalk.getNameString(),
                         pathToRepository,
@@ -162,7 +162,7 @@ public class JGitObjectProducer {
             }
             while (treeWalk.next()) {
                 if (treeWalk.getPathString().split("/").length > split.length) {
-                    toLoad.add(FileModelFactory.createFileModel(
+                    toLoad.add(FileFactory.createFileModel(
                             treeWalk.isSubtree(),
                             treeWalk.getNameString(),
                             pathToRepository,

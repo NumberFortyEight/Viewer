@@ -1,10 +1,10 @@
 package com.example.viewer.services.interfaces;
 
-import com.example.viewer.models.CommitModel;
+import com.example.viewer.dataClasses.Commit;
 
 import java.util.List;
 
 public interface CommitService {
-    List<CommitModel> getAllCommits(String fullPath);
-    List<CommitModel> getCommitsByPath(String fullPath);
+    List<Commit> getAllCommits(String fullPath);
+    List<Commit> getCommitsByPath(String fullPath);
 }

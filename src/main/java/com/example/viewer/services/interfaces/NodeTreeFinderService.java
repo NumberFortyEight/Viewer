@@ -1,6 +1,6 @@
 package com.example.viewer.services.interfaces;
 
-import com.example.viewer.models.Node;
+import com.example.viewer.dataClasses.Node;
 
 import java.util.Map;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package com.example.viewer.services;
 
-import com.example.viewer.models.FileModel;
-import com.example.viewer.models.FileModelFactory;
+import com.example.viewer.dataClasses.FileModel;
+import com.example.viewer.dataClasses.FileFactory;
 import com.example.viewer.services.interfaces.DirsService;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class DirsServiceImpl implements DirsService {
             List<File> files = Arrays.asList(Objects.requireNonNull(dirs.listFiles()));
             return Optional.of(files.stream()
                     .filter(file -> !file.getName().contains(".wiki"))
-                    .map(file -> FileModelFactory.createFileModel(file, workPath)).collect(Collectors.toList()));
+                    .map(file -> FileFactory.createFileModel(file, workPath)).collect(Collectors.toList()));
         }
         return Optional.empty();
     }

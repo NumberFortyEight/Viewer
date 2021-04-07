@@ -1,4 +1,4 @@
-package com.example.viewer.models;
+package com.example.viewer.dataClasses;
 
 import com.example.viewer.enums.State;
 import lombok.Builder;

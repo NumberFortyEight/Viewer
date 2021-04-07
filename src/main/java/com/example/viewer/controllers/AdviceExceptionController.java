@@ -1,6 +1,6 @@
 package com.example.viewer.controllers;
 
-import com.example.viewer.exception.*;
+import com.example.viewer.exceptions.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,7 +1,7 @@
 package com.example.viewer.controllers;
 
-import com.example.viewer.models.ContentModel;
-import com.example.viewer.models.Node;
+import com.example.viewer.dataClasses.Content;
+import com.example.viewer.dataClasses.Node;
 import com.example.viewer.services.nodes.CreationOrUpdateNodeTreeService;
 import com.example.viewer.services.MainQueryService;
 import com.example.viewer.services.interfaces.JGitService;
@@ -25,7 +25,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-public class RestMainController {
+public class MainController {
 
     private final Map<String, Node> userAndNodeTree = new HashMap<>();
     public final CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService;
@@ -45,18 +45,18 @@ public class RestMainController {
         Optional<String> OptionalQuery = Optional.ofNullable(request.getQueryString());
         OptionalQuery.ifPresent(query -> mainQueryService.queryLogic(user, fullPath, query, userAndNodeTree));
 
-        ContentModel contentModel = jgitService.getContent(user, fullPath, userAndNodeTree);
-        switch (contentModel.getContentType()){
+        Content content = jgitService.getContent(user, fullPath, userAndNodeTree);
+        switch (content.getContentType()){
             case IMAGE:
                 response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-                IOUtils.copy(new ByteArrayInputStream((byte[]) contentModel.getObject()), response.getOutputStream());
+                IOUtils.copy(new ByteArrayInputStream((byte[]) content.getObject()), response.getOutputStream());
                 return null;
             case VIDEO:
                 response.setContentType("video/mp4");
-                IOUtils.copy(new ByteArrayInputStream((byte[]) contentModel.getObject()), response.getOutputStream());
+                IOUtils.copy(new ByteArrayInputStream((byte[]) content.getObject()), response.getOutputStream());
                 return null;
             default:
-                return contentModel.getObject();
+                return content.getObject();
         }
     }
 }
