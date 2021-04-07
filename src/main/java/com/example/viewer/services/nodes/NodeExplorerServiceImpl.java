@@ -1,15 +1,18 @@
-package com.example.viewer.services;
+package com.example.viewer.services.nodes;
 
+import com.example.viewer.exception.JGitCommitInfoException;
 import com.example.viewer.models.Node;
 import com.example.viewer.services.interfaces.NodeExplorerService;
 import com.example.viewer.services.interfaces.NodeTreeFinderService;
 import com.example.viewer.services.jgit.JGitCommitInfo;
 import com.example.viewer.util.PathHelper;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -22,16 +25,19 @@ public class NodeExplorerServiceImpl implements NodeExplorerService {
 
     @Override
     public RevCommit findCommitInNodeTreeByPath(String username, String fullPath, Map<String, Node> userAndNodeTree) {
-
-        RevCommit firstRevCommit = appContext.getBean(JGitCommitInfo.class, fullPath).findFirstRevCommit();
-
+        JGitCommitInfo jGitCommitInfo = appContext.getBean(JGitCommitInfo.class);
         Optional<Node> optionalNode = nodeTreeFinderService.getOptionalNodeTreeByUsername(username, userAndNodeTree);
         String repositoryWithWorkPath = PathHelper.skip(fullPath, 1);
-
-        if (optionalNode.isPresent()) {
-            return getTargetCommitInNode(optionalNode.get(), repositoryWithWorkPath).orElse(firstRevCommit);
-        } else {
-            return firstRevCommit;
+        try {
+            jGitCommitInfo.setGitByPath(fullPath);
+            RevCommit firstRevCommit = jGitCommitInfo.findFirstRevCommit();
+            if (optionalNode.isPresent()) {
+                return getTargetCommitInNode(optionalNode.get(), repositoryWithWorkPath).orElse(firstRevCommit);
+            } else {
+                return firstRevCommit;
+            }
+        } catch (IOException | GitAPIException e) {
+            throw new JGitCommitInfoException("Exception of load commit", e);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.viewer.services;
 
+import com.example.viewer.exception.JGitException;
 import com.example.viewer.models.ContentModel;
 import com.example.viewer.models.Node;
 import com.example.viewer.services.interfaces.JGitService;
@@ -27,11 +28,12 @@ public class JGitServiceImpl implements JGitService {
     public ContentModel getContent(String user, String fullPath, Map<String, Node> userAndNodeTree) {
         try {
             RevCommit fundedCommit = nodeExplorerService.findCommitInNodeTreeByPath(user, fullPath, userAndNodeTree);
-            JGitObjectProducer jGitObjectProducer = appContext.getBean(JGitObjectProducer.class, fundedCommit, fullPath);
+            JGitObjectProducer jGitObjectProducer = appContext.getBean(JGitObjectProducer.class);
+            jGitObjectProducer.setFields(fundedCommit, fullPath);
             return jGitObjectProducer.getObject();
         } catch (Exception e) {
             LOGGER.warn("Content load fail on path: " + fullPath, e);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Content load fail on path: " + fullPath);
+            throw new JGitException( "Content load fail on path: " + fullPath, e);
         }
     }
 

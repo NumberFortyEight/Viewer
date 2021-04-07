@@ -1,14 +1,18 @@
-package com.example.viewer.services;
+package com.example.viewer.services.nodes;
 
+import com.example.viewer.exception.JGitException;
 import com.example.viewer.models.Node;
 import com.example.viewer.services.interfaces.NodeTreeFinderService;
 import com.example.viewer.util.PathHelper;
 import com.example.viewer.services.jgit.JGitCommitInfo;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -21,19 +25,22 @@ public class CreationOrUpdateNodeTreeService {
     public void createNodeHierarchy(String user, String fullPath, int unixTime, Map<String, Node> userAndNodeTree) {
         String repositoryName = PathHelper.skipAndLimit(fullPath, 1, 1);
         String workPathWithRepository = PathHelper.skip(fullPath, 1);
-
         Node workNode = nodeTreeFinderService.getExistOrNewNode(user, repositoryName, userAndNodeTree);
+        try {
+            JGitCommitInfo jGitCommitInfo = appContext.getBean(JGitCommitInfo.class);
+            jGitCommitInfo.setGitByPath(fullPath);
+            RevCommit commitByDate = jGitCommitInfo.getCommitByDate(unixTime);
 
-        JGitCommitInfo info = appContext.getBean(JGitCommitInfo.class, fullPath);
+            jGitCommitInfo.getPathsInTree(fullPath, commitByDate)
+                    .forEach(path -> setNodeDependency(workNode, repositoryName + PathHelper.getAbsolutePath(path)));
 
-        RevCommit commitByDate = info.getCommitByDate(unixTime);
+            setCommitToNodeTree(findNodeByPath(workNode, workPathWithRepository).orElse(workNode), commitByDate);
 
-        info.getPathsInTree(fullPath, commitByDate)
-                .forEach(path -> setNodeDependency(workNode, repositoryName + PathHelper.getAbsolutePath(path)));
+            userAndNodeTree.put(user, workNode);
 
-        setCommitToNodeTree(findNodeByPath(workNode, workPathWithRepository).orElse(workNode), commitByDate);
-
-        userAndNodeTree.put(user, workNode);
+        } catch (IOException | GitAPIException e) {
+            throw new JGitException("Jgit error", e);
+        }
     }
 
     private void setCommitToNodeTree(Node node, RevCommit revCommit) {

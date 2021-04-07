@@ -7,6 +7,8 @@ import com.example.viewer.models.FileModel;
 import com.example.viewer.models.FileModelFactory;
 import com.example.viewer.services.interfaces.JGitProvider;
 import com.example.viewer.util.PathHelper;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
@@ -14,24 +16,22 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+@RequiredArgsConstructor
 public class JGitObjectProducer {
 
-    private final String pathToRepository;
-    private final TreeWalk treeWalk;
-    private final RevCommit targetCommit;
-    private final String workPath;
-    private final Repository repository;
+    private String pathToRepository;
+    private TreeWalk treeWalk;
+    private RevCommit targetCommit;
+    private String workPath;
+    private Repository repository;
+    @NonNull
+    private final ApplicationContext appContext;
 
-    public JGitObjectProducer(RevCommit revCommit, String fullPath, ApplicationContext appContext) {
+    public void setFields(RevCommit revCommit, String fullPath) throws IOException {
         Git git = appContext.getBean(JGitProvider.class).getConnection(fullPath);
         this.repository = git.getRepository();
         this.targetCommit = revCommit;
@@ -39,7 +39,6 @@ public class JGitObjectProducer {
         this.workPath = PathHelper.skip(fullPath, 2);
         this.treeWalk = new TreeWalk(repository);
     }
-
     public boolean isThisExist() throws IOException {
         if (workPath.equals("") || workPath.equals("/")) {
             return true;
@@ -93,7 +92,7 @@ public class JGitObjectProducer {
             if (split.length >= 2) {
                 String relevant = split[1];
                 treeWalk.reset();
-                switch (relevant){
+                switch (relevant) {
                     case ("gif"):
                     case ("png"):
                     case ("jpg"):
@@ -110,19 +109,16 @@ public class JGitObjectProducer {
         return ContentType.UNSUPPORTED_FORMAT;
     }
 
-    public ContentModel getObject(){
-        try {
-            if (isThisExist()) {
-                if (isFile()) {
-                    return new ContentModel(getContentType(), loadFile());
-                } else {
-                    return new ContentModel(ContentType.JSON, getDirs());
-                }
+    public ContentModel getObject() throws Exception {
+        if (isThisExist()) {
+            if (isFile()) {
+                return new ContentModel(getContentType(), loadFile());
+            } else {
+                return new ContentModel(ContentType.JSON, getDirs());
             }
-        } catch (Exception ignored){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Object not found" + workPath);
+        } else {
+            return new ContentModel(ContentType.UNSUPPORTED_FORMAT, null);
         }
-        return new ContentModel(ContentType.UNSUPPORTED_FORMAT, null);
     }
 
     public byte[] loadFile() throws IOException {

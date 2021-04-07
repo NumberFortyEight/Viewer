@@ -1,118 +1,127 @@
 package com.example.viewer.services.jgit;
 
-import com.example.viewer.exception.JGitCommitInfoException;
 import com.example.viewer.models.CommitModel;
+import com.example.viewer.models.RevCommitPacker;
 import com.example.viewer.services.interfaces.JGitProvider;
 import com.example.viewer.util.PathHelper;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
-import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.RenameDetector;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.StreamSupport;
-
+@Slf4j
+@RequiredArgsConstructor
 public class JGitCommitInfo {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JGitCommitInfo.class);
-    private final Git git;
 
-    public JGitCommitInfo(String fullPath, ApplicationContext appContext) {
+    private Git git;
+    @NonNull
+    private final ApplicationContext appContext;
+
+    public void setGitByPath(String fullPath) throws IOException {
         JGitProvider jGitProvider = appContext.getBean(JGitProvider.class);
         this.git = jGitProvider.getConnection(fullPath);
     }
 
-    public List<RevCommit> getAllCommits() {
-        List<RevCommit> revCommitList = new ArrayList<>();
-        try {
-            for (RevCommit revCommit : git.log().call()) {
-                revCommitList.add(revCommit);
-            }
-            return revCommitList;
-        } catch (GitAPIException gitAPIException) {
-            return revCommitList;
+    public List<CommitModel> getAllCommitsModelList() throws GitAPIException {
+        return RevCommitPacker.getCommitModelListOfListRevCommit(getAllCommits());
+    }
+
+    public RevCommit getCommitByDate(int unixTime) throws GitAPIException {
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(git.log()
+                        .call()
+                        .iterator(), Spliterator.ORDERED), false)
+                .filter(revCommit -> revCommit.getCommitTime() == unixTime)
+                .findFirst()
+                .orElse(findFirstRevCommit());
+    }
+
+    public RevCommit findFirstRevCommit() throws GitAPIException {
+        return git.log().call().iterator().next();
+    }
+
+    public List<CommitModel> getCommitsByFullPath(String fullPath) throws Exception {
+        String workPath = PathHelper.skip(fullPath, 2);
+        if (workPath.equals("") || workPath.equals("/")) {
+            return getAllCommitsModelList();
+        } else {
+            return RevCommitPacker.getCommitModelListOfListRevCommit(getCommitsByPath(workPath));
         }
     }
 
-    public String getDiffOrNull(int unixTime) {
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-            try (DiffFormatter diffFormatter = new DiffFormatter(byteArrayOutputStream)) {
-                diffFormatter.setRepository(git.getRepository());
-                Optional<RevCommit> optionalParentCommit = getAllCommits().stream()
-                        .filter(revCommit -> revCommit.getCommitTime() < unixTime)
-                        .findFirst();
-                for (DiffEntry entry : diffFormatter.scan(getCommitByDate(unixTime), optionalParentCommit.orElse(findFirstRevCommit()))) {
-                    diffFormatter.format(diffFormatter.toFileHeader(entry));
+    private ArrayList<RevCommit> getCommitsByPath(String path) throws Exception {
+        ArrayList<RevCommit> commits = new ArrayList<>();
+        RevCommit start = null;
+        do {
+            Iterable<RevCommit> log = git.log().addPath(path).call();
+            for (RevCommit commit : log) {
+                if (commits.contains(commit)) {
+                    start = null;
+                } else {
+                    start = commit;
+                    commits.add(commit);
                 }
-                System.out.println(byteArrayOutputStream);
-                return byteArrayOutputStream.toString();
             }
-        } catch (Exception e){
-            LOGGER.warn("Diff Exception", e);
-            return null;
+            if (start == null) return commits;
         }
-    }
+        while ((path = getRenamedPath(start, path)) != null);
 
-    public List<CommitModel> getCommitModelList() {
-        ArrayList<CommitModel> commitModelArrayList = new ArrayList<>();
-        try {
-            for (RevCommit nextCommit : git.log().call()) {
-                commitModelArrayList.add(new CommitModel(nextCommit.getFullMessage(),
-                        nextCommit.getAuthorIdent().getName(), String.valueOf(nextCommit.getCommitTime())));
+        return commits;
+    }
+    private String getRenamedPath( RevCommit start, String path) throws Exception {
+        Iterable<RevCommit> allCommitsLater = git.log().add(start).call();
+        for (RevCommit commit : allCommitsLater) {
+            Repository repository = git.getRepository();
+            TreeWalk tw = new TreeWalk(repository);
+            tw.addTree(commit.getTree());
+            tw.addTree(start.getTree());
+            tw.setRecursive(true);
+            RenameDetector rd = new RenameDetector(repository);
+            rd.addAll(DiffEntry.scan(tw));
+            List<DiffEntry> files = rd.compute();
+            for (DiffEntry diffEntry : files) {
+                if ((diffEntry.getChangeType() == DiffEntry.ChangeType.RENAME || diffEntry.getChangeType() == DiffEntry.ChangeType.COPY) && diffEntry.getNewPath().contains(path)) {
+                    return diffEntry.getOldPath();
+                }
             }
-        } catch (GitAPIException gitAPIException) {
-            LOGGER.warn("Commits model load exception ", gitAPIException);
         }
-        return commitModelArrayList;
+        return null;
     }
 
-    public RevCommit getCommitByDate(int unixTime) {
-        try {
-            return StreamSupport.stream(
-                    Spliterators.spliteratorUnknownSize(git.log().call().iterator(), Spliterator.ORDERED),
-                    false).filter(revCommit -> revCommit.getCommitTime() == unixTime).findFirst().orElse(findFirstRevCommit());
-        } catch (GitAPIException e) {
-            throw new JGitCommitInfoException("Commit by date exception", e);
-        }
-    }
-
-    public RevCommit findFirstRevCommit() {
-        try {
-            return git.log().call().iterator().next();
-        } catch (GitAPIException e) {
-            throw new JGitCommitInfoException("first commit exception", e);
-        }
-    }
-
-    public List<String> getPathsInTree(String fullPath, RevCommit targetCommit) {
+    public List<String> getPathsInTree(String fullPath, RevCommit targetCommit) throws IOException {
         String workPath = PathHelper.skip(fullPath, 2);
         List<String> toLoad = new ArrayList<>();
-        try {
-            TreeWalk treeWalk = new TreeWalk(git.getRepository());
-            treeWalk.addTree(targetCommit.getTree());
-            treeWalk.setRecursive(true);
-            if (!workPath.equals("")) {
-                treeWalk.setFilter(PathFilter.create(workPath));
-            }
-            while (treeWalk.next()) {
-                toLoad.add(treeWalk.getPathString());
-            }
-            treeWalk.reset();
-            return toLoad;
-        } catch (IOException e) {
-            LOGGER.warn("Empty path", e);
-            return toLoad;
+        TreeWalk treeWalk = new TreeWalk(git.getRepository());
+        treeWalk.addTree(targetCommit.getTree());
+        treeWalk.setRecursive(true);
+        if (!workPath.equals("")) {
+            treeWalk.setFilter(PathFilter.create(workPath));
         }
+        while (treeWalk.next()) {
+            toLoad.add(treeWalk.getPathString());
+        }
+        treeWalk.reset();
+        return toLoad;
+    }
+
+    public List<RevCommit> getAllCommits() throws GitAPIException {
+        List<RevCommit> revCommitList = new ArrayList<>();
+        for (RevCommit revCommit : git.log().call()) {
+            revCommitList.add(revCommit);
+        }
+        return revCommitList;
     }
 }

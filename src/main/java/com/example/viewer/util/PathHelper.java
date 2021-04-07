@@ -1,5 +1,7 @@
 package com.example.viewer.util;
 
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,6 +40,10 @@ public class PathHelper {
         String relativePath = getRelativePath(path);
         String skipAndLimitedString = Arrays.stream(relativePath.split("/")).skip(skip).limit(limit).collect(Collectors.joining("/"));
         return skipAndLimitedString.equals("") ? "/" : skipAndLimitedString;
+    }
+
+    public static String getFullPath(String requestURI){
+        return PathHelper.getAbsolutePath(PathHelper.skip(URLDecoder.decode(requestURI, Charset.defaultCharset()), 1));
     }
 
 }

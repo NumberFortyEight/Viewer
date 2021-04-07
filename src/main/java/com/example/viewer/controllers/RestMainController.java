@@ -2,7 +2,7 @@ package com.example.viewer.controllers;
 
 import com.example.viewer.models.ContentModel;
 import com.example.viewer.models.Node;
-import com.example.viewer.services.CreationOrUpdateNodeTreeService;
+import com.example.viewer.services.nodes.CreationOrUpdateNodeTreeService;
 import com.example.viewer.services.MainQueryService;
 import com.example.viewer.services.interfaces.JGitService;
 import com.example.viewer.util.PathHelper;

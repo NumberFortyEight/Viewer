@@ -1,4 +1,4 @@
-package com.example.viewer.services;
+package com.example.viewer.services.nodes;
 
 import com.example.viewer.models.Node;
 import com.example.viewer.services.interfaces.NodeTreeFinderService;
