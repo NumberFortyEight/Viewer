@@ -121,6 +121,7 @@ public class JGitObjectProducer {
         }
     }
 
+    @SuppressWarnings("LoopStatementThatDoesntLoop")
     public byte[] loadFile() throws IOException {
         treeWalk.addTree(targetCommit.getTree());
         treeWalk.setRecursive(true);
