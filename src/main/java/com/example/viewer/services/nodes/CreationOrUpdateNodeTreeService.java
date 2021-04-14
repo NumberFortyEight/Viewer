@@ -1,7 +1,7 @@
 package com.example.viewer.services.nodes;
 
 import com.example.viewer.dataClasses.Node;
-import com.example.viewer.exceptions.JGitException;
+import com.example.viewer.exceptions.JGit.JGitException;
 import com.example.viewer.services.interfaces.NodeTreeFinderService;
 import com.example.viewer.util.PathHelper;
 import com.example.viewer.services.jgit.JGitCommitInfo;

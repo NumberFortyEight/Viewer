@@ -1,7 +1,6 @@
 package com.example.viewer.controllers;
 
 import com.example.viewer.dataClasses.Commit;
-import com.example.viewer.services.interfaces.CommitQueryService;
 import com.example.viewer.services.interfaces.CommitService;
 import com.example.viewer.util.PathHelper;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommitController {
 
-    public final CommitQueryService commitQueryService;
     private final CommitService commitService;
 
     @GetMapping("/commit/{student}/{repository}/allcommits")

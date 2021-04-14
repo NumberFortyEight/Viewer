@@ -43,7 +43,10 @@ public class PathHelper {
     }
 
     public static String getFullPath(String requestURI){
-        return PathHelper.getAbsolutePath(PathHelper.skip(URLDecoder.decode(requestURI, Charset.defaultCharset()), 1));
+        return PathHelper.getAbsolutePath(PathHelper.skip(getEncodeString(requestURI), 1));
+    }
+    public static String getEncodeString(String string){
+        return URLDecoder.decode(string, Charset.defaultCharset());
     }
 
 }

@@ -1,6 +1,6 @@
 package com.example.viewer.services;
 
-import com.example.viewer.exceptions.JGitCommitInfoException;
+import com.example.viewer.exceptions.JGit.JGitCommitInfoException;
 import com.example.viewer.dataClasses.Commit;
 import com.example.viewer.services.interfaces.CommitService;
 import com.example.viewer.services.jgit.JGitCommitInfo;

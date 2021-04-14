@@ -2,6 +2,7 @@ package com.example.viewer.services;
 
 import com.example.viewer.dataClasses.FileModel;
 import com.example.viewer.dataClasses.FileFactory;
+import com.example.viewer.exceptions.DirsLookupException;
 import com.example.viewer.services.interfaces.DirsService;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,6 @@ public class DirsServiceImpl implements DirsService {
                     .filter(file -> !file.getName().contains(".wiki"))
                     .map(file -> FileFactory.createFileModel(file, workPath)).collect(Collectors.toList()));
         }
-        return Optional.empty();
+        throw new DirsLookupException("User not found");
     }
 }
