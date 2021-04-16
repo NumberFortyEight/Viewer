@@ -5,6 +5,6 @@ import com.example.viewer.dataClasses.Node;
 
 import java.util.Map;
 
-public interface JGitService {
+public interface JGitFacadeService {
     Content getContent(String user, String fullPath, Map<String, Node> userAndNodeTree);
 }

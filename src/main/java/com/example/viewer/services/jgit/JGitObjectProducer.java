@@ -1,6 +1,6 @@
 package com.example.viewer.services.jgit;
 
-import com.example.viewer.enums.ContentType;
+import com.example.viewer.dataClasses.enums.ContentType;
 import com.example.viewer.exceptions.JGit.JGitFileLoadException;
 import com.example.viewer.dataClasses.Content;
 import com.example.viewer.dataClasses.FileModel;

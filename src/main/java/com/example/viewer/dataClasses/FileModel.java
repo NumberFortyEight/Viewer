@@ -1,6 +1,6 @@
 package com.example.viewer.dataClasses;
 
-import com.example.viewer.enums.State;
+import com.example.viewer.dataClasses.enums.State;
 import lombok.Builder;
 import lombok.Data;
 

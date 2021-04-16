@@ -1,6 +1,6 @@
 package com.example.viewer.dataClasses;
 
-import com.example.viewer.enums.ContentType;
+import com.example.viewer.dataClasses.enums.ContentType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

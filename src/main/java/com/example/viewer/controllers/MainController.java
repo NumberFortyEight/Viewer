@@ -2,9 +2,8 @@ package com.example.viewer.controllers;
 
 import com.example.viewer.dataClasses.Content;
 import com.example.viewer.dataClasses.Node;
-import com.example.viewer.services.nodes.CreationOrUpdateNodeTreeService;
+import com.example.viewer.services.interfaces.JGitFacadeService;
 import com.example.viewer.services.MainQueryService;
-import com.example.viewer.services.interfaces.JGitService;
 import com.example.viewer.util.PathHelper;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -16,8 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,9 +25,8 @@ import java.util.Optional;
 public class MainController {
 
     private final Map<String, Node> userAndNodeTree = new HashMap<>();
-    public final CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService;
     public final MainQueryService mainQueryService;
-    public final JGitService jgitService;
+    public final JGitFacadeService jgitFacadeService;
 
     @GetMapping("/committree")
     public Map<String, Node> getUserAndNodeTree(){
@@ -41,11 +37,11 @@ public class MainController {
     @ResponseStatus(HttpStatus.OK)
     public Object mainJGitApi(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String user = "One";
-        String fullPath = PathHelper.getAbsolutePath(PathHelper.skip(URLDecoder.decode(request.getRequestURI(), Charset.defaultCharset()), 1));
+        String fullPath = PathHelper.getFullPath(request.getRequestURI());
         Optional<String> OptionalQuery = Optional.ofNullable(request.getQueryString());
         OptionalQuery.ifPresent(query -> mainQueryService.queryLogic(user, fullPath, query, userAndNodeTree));
 
-        Content content = jgitService.getContent(user, fullPath, userAndNodeTree);
+        Content content = jgitFacadeService.getContent(user, fullPath, userAndNodeTree);
         switch (content.getContentType()){
             case IMAGE:
                 response.setContentType(MediaType.IMAGE_JPEG_VALUE);

@@ -15,6 +15,7 @@ public class NodeTreeFinderServiceImpl implements NodeTreeFinderService {
         return userAndNodeTree.containsKey(username) ? Optional.ofNullable(userAndNodeTree.get(username)) : Optional.empty();
     }
 
+
     @Override
     public Node getExistOrNewNode(String username, String repositoryName, Map<String, Node> userAndNodeTree) {
         Node existNode = userAndNodeTree.get(username);

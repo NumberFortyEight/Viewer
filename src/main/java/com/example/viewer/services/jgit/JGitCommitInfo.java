@@ -44,10 +44,10 @@ public class JGitCommitInfo {
                         .iterator(), Spliterator.ORDERED), false)
                 .filter(revCommit -> revCommit.getCommitTime() == unixTime)
                 .findFirst()
-                .orElse(findFirstRevCommit());
+                .orElse(getFirstRevCommit());
     }
 
-    public RevCommit findFirstRevCommit() throws GitAPIException {
+    public RevCommit getFirstRevCommit() throws GitAPIException {
         return git.log().call().iterator().next();
     }
 

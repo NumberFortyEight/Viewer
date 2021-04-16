@@ -16,7 +16,7 @@ public class ViewerApplication {
 
 		//nodeCreateService.createNodeHierarchy("aaa", PathHelper.getAbsolutePath("/Student1/Task1.git/"), allCommits.stream().findFirst().get().getCommitTime() , userAndNodeTree);
 
-//		JGitServiceImpl jgitServiceImpl = new JGitServiceImpl();
+//		JGitFacadeServiceImpl jgitServiceImpl = new JGitFacadeServiceImpl();
 //		RevCommit revCommit = jgitServiceImpl.targetCommit("/TestRepository.git/html/1111.html", userAndNodeTree.get("aaa"));
 //		System.out.println(revCommit);
 

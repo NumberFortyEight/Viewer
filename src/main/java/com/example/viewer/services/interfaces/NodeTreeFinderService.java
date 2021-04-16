@@ -6,6 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface NodeTreeFinderService {
-    Optional<Node> getOptionalNodeTreeByUsername(String user, Map<String, Node> userAndNodeTree);
-    Node getExistOrNewNode(String user, String repositoryName, Map<String, Node> userAndNodeTree);
+    Optional<Node> getOptionalNodeTreeByUsername(String username, Map<String, Node> userAndNodeTree);
+    Node getExistOrNewNode(String username, String repositoryName, Map<String, Node> userAndNodeTree);
 }
