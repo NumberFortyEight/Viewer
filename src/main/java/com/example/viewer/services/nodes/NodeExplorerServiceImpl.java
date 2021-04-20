@@ -22,7 +22,7 @@ public class NodeExplorerServiceImpl implements NodeExplorerService {
     private final JGitFactoryService jGitFactoryService;
 
     @Override
-    public RevCommit findCommitInNodeTreeByPath(String username, String fullPath, Map<String, Node> userAndNodeTree) {
+    public RevCommit findCommitInNodeByPath(String username, String fullPath, Map<String, Node> userAndNodeTree) {
         String repositoryWithWorkPath = PathHelper.skip(fullPath, 1);
         Optional<Node> optionalNode = nodeTreeFinderService.getOptionalNodeTreeByUsername(username, userAndNodeTree);
         try {

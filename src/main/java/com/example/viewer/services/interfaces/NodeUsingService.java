@@ -5,6 +5,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Map;
 
-public interface NodeExplorerService {
-    RevCommit findCommitInNodeByPath(String user, String fullPath, Map<String, Node> userAndNodeTree);
+public interface NodeUsingService {
+    Node fillNodeTree(Node node, String repositoryName, String fullPath, int commitTime, Map<String, Node> userAndNodeTree);
 }

@@ -16,31 +16,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class CreationOrUpdateNodeTreeService {
-
-    private final NodeTreeFinderService nodeTreeFinderService;
-    private final JGitFactoryService jGitFactoryService;
-
-    public void createNodeHierarchy(String username, String fullPath, int unixTime, Map<String, Node> userAndNodeTree) {
-        String repositoryName = PathHelper.skipAndLimit(fullPath, 1, 1);
-        String workPathWithRepository = PathHelper.skip(fullPath, 1);
-
-        Node workNode = nodeTreeFinderService.getExistOrNewNode(username, repositoryName, userAndNodeTree);
-        try {
-            JGitCommitInfo commitInfo = jGitFactoryService.getCommitInfo(fullPath);
-            RevCommit commitByDate = commitInfo.getCommitByDate(unixTime);
-
-            commitInfo.getPathsInTree(fullPath, commitByDate)
-                    .forEach(path -> setNodeDependency(workNode, repositoryName + PathHelper.getAbsolutePath(path)));
-
-            setCommitToNodeTree(findNodeByPath(workNode, workPathWithRepository).orElse(workNode), commitByDate);
-
-            userAndNodeTree.put(username, workNode);
-
-        } catch (IOException | GitAPIException e) {
-            throw new JGitException("Jgit error", e);
-        }
-    }
+public class WorkWithNodeService {
 
     public void setCommitToNodeTree(Node node, RevCommit revCommit) {
         node.setRevCommit(revCommit);

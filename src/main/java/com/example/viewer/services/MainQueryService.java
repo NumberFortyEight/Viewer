@@ -1,7 +1,8 @@
 package com.example.viewer.services;
 
 import com.example.viewer.dataClasses.Node;
-import com.example.viewer.services.nodes.CreationOrUpdateNodeTreeService;
+import com.example.viewer.services.interfaces.NodeTreeService;
+import com.example.viewer.services.nodes.WorkWithNodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class MainQueryService {
-    public final CreationOrUpdateNodeTreeService creationOrUpdateNodeTreeService;
+    public final WorkWithNodeService workWithNodeService;
+    public final NodeTreeService nodeTreeService;
 
     public void queryLogic(String user, String fullPath, String query, Map<String, Node> userAndNodeTree) {
         String[] split = query.split("=");
@@ -19,7 +21,7 @@ public class MainQueryService {
             String value = split[1];
             switch (queryType){
                 case "commit":
-                    creationOrUpdateNodeTreeService.createNodeHierarchy(user, fullPath, Integer.parseInt(value), userAndNodeTree);
+                    nodeTreeService.createNodeHierarchy(user, fullPath, Integer.parseInt(value), userAndNodeTree);
                     break;
                 case "drop":
                     userAndNodeTree.remove(user);

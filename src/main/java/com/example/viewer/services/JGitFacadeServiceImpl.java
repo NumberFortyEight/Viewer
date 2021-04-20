@@ -20,7 +20,7 @@ public class JGitFacadeServiceImpl implements JGitFacadeService {
     private final JGitFactoryService jGitFactoryService;
 
     public Content getContent(String user, String fullPath, Map<String, Node> userAndNodeTree) {
-        RevCommit detectedCommit = nodeExplorerService.findCommitInNodeTreeByPath(user, fullPath, userAndNodeTree);
+        RevCommit detectedCommit = nodeExplorerService.findCommitInNodeByPath(user, fullPath, userAndNodeTree);
         return jGitFactoryService.getContent(fullPath, detectedCommit);
     }
 
