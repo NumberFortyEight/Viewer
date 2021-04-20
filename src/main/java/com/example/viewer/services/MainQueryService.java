@@ -4,6 +4,7 @@ import com.example.viewer.dataClasses.Node;
 import com.example.viewer.services.interfaces.NodeTreeService;
 import com.example.viewer.services.nodes.WorkWithNodeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

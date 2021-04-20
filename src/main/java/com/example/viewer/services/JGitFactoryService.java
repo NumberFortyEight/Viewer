@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 @AllArgsConstructor
-@Slf4j
 public class JGitFactoryService {
     private final ApplicationContext appContext;
 
@@ -25,7 +25,7 @@ public class JGitFactoryService {
             jGitCommitInfo.setGitByPath(fullPath);
             return jGitCommitInfo;
         } catch (IOException e) {
-            log.warn("fail to create commit info by path" + fullPath);
+            log.warn("fail to create commit info by path {}", fullPath);
             throw new JGitCommitInfoException("utility jgit commit class fail", e);
         }
     }
@@ -36,7 +36,7 @@ public class JGitFactoryService {
             jGitObjectProducer.setFields(foundCommit, fullPath);
             return jGitObjectProducer.getObject();
         } catch (Exception e) {
-            log.warn("fail to create object producer by path" + fullPath);
+            log.warn("fail to create object producer by path {}", fullPath);
             throw new JGitException("utility jgit object class fail", e);
         }
     }

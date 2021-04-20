@@ -7,6 +7,7 @@ import com.example.viewer.services.interfaces.NodeTreeFinderService;
 import com.example.viewer.util.PathHelper;
 import com.example.viewer.services.jgit.JGitCommitInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.stereotype.Service;

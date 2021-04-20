@@ -11,8 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-@Service
+
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class JGitFacadeServiceImpl implements JGitFacadeService {
 
@@ -25,3 +26,4 @@ public class JGitFacadeServiceImpl implements JGitFacadeService {
     }
 
 }
+

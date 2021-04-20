@@ -6,11 +6,13 @@ import com.example.viewer.services.interfaces.NodeTreeFinderService;
 import com.example.viewer.services.interfaces.NodeTreeService;
 import com.example.viewer.util.PathHelper;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class NodeTreeServiceImpl implements NodeTreeService {
@@ -30,15 +32,18 @@ public class NodeTreeServiceImpl implements NodeTreeService {
             boolean isCurrentRepository = existNode
                     .getName()
                     .equals(repositoryName);
-
+            log.debug("founded node from repository {}",  existNode.getName());
             if (isCurrentRepository) {
+                log.debug("its current repository");
                 currentNode = nodeTreeUsingService.fillNodeTree(existNode, repositoryName, fullPath, commitTime, userAndNodeTree);
                 userAndNodeTree.put(username, currentNode);
                 return;
             } else {
+                log.debug("delete node - {}", username);
                 userAndNodeTree.remove(username);
             }
         }
+        log.debug("create new node with repository name {}",  repositoryName);
         Node node = new Node();
         node.setName(repositoryName);
         currentNode = nodeTreeUsingService.fillNodeTree(node, repositoryName, fullPath, commitTime, userAndNodeTree);
