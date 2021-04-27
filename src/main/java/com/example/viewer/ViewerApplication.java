@@ -8,19 +8,6 @@ public class ViewerApplication {
 
 	public static void main(String[] args){
 		SpringApplication.run(ViewerApplication.class, args);
-
-		//List<RevCommit> allCommits = new JgitCommits().getInfo(PathHelper.getRelativePath("/Student1/TestRepository.git/")).getAllCommits();
-		//Map<String, Node> userAndNodeTree = new HashMap<>();
-
-		//CreationOrUpdateNodeTreeService nodeCreateService = new CreationOrUpdateNodeTreeService();
-
-		//nodeCreateService.createNodeHierarchy("aaa", PathHelper.getAbsolutePath("/Student1/Task1.git/"), allCommits.stream().findFirst().get().getCommitTime() , userAndNodeTree);
-
-//		JGitFacadeServiceImpl jgitServiceImpl = new JGitFacadeServiceImpl();
-//		RevCommit revCommit = jgitServiceImpl.targetCommit("/TestRepository.git/html/1111.html", userAndNodeTree.get("aaa"));
-//		System.out.println(revCommit);
-
-//		System.out.println(userAndNodeTree);
 	}
 
 }
