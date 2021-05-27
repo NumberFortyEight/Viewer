@@ -147,6 +147,7 @@ public class JGitObjectProducer {
                         treeWalk.isSubtree(),
                         treeWalk.getNameString(),
                         pathToRepository,
+                        targetCommit.getCommitTime(),
                         treeWalk.getPathString()));
             }
         } else {
@@ -167,6 +168,7 @@ public class JGitObjectProducer {
                             treeWalk.isSubtree(),
                             treeWalk.getNameString(),
                             pathToRepository,
+                            targetCommit.getCommitTime(),
                             treeWalk.getPathString()));
                 }
             }

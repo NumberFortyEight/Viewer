@@ -9,5 +9,6 @@ import lombok.Data;
 public class FileModel {
     private State state;
     private String name;
+    private Integer commitTime;
     private String href;
 }
