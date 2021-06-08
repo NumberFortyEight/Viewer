@@ -47,6 +47,10 @@ public class MainController {
                 response.setContentType(MediaType.IMAGE_JPEG_VALUE);
                 IOUtils.copy(new ByteArrayInputStream((byte[]) content.getObject()), response.getOutputStream());
                 return null;
+            case SVG:
+                response.setContentType("image/svg+xml");
+                IOUtils.copy(new ByteArrayInputStream((byte[]) content.getObject()), response.getOutputStream());
+                return null;
             case VIDEO:
                 response.setContentType("video/mp4");
                 IOUtils.copy(new ByteArrayInputStream((byte[]) content.getObject()), response.getOutputStream());

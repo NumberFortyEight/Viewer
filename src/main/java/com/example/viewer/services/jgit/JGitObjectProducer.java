@@ -97,6 +97,8 @@ public class JGitObjectProducer {
                     case ("png"):
                     case ("jpg"):
                         return ContentType.IMAGE;
+                    case ("svg"):
+                        return ContentType.SVG;
                     case ("mp4"):
                     case ("avi"):
                         return ContentType.VIDEO;

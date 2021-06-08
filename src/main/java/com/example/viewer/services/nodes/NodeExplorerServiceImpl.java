@@ -31,7 +31,11 @@ public class NodeExplorerServiceImpl implements NodeExplorerService {
         try {
             RevCommit firstRevCommit = jGitFactoryService.getCommitInfo(fullPath).getFirstRevCommit();
             if (optionalNode.isPresent()) {
-                return getTargetCommitInNode(optionalNode.get(), repositoryWithWorkPath).orElse(firstRevCommit);
+                Node node = optionalNode.get();
+                if (!node.getName().equals(PathHelper.limit(repositoryWithWorkPath, 1))) {
+                    return firstRevCommit;
+                }
+                return getTargetCommitInNode(node, repositoryWithWorkPath).orElse(firstRevCommit);
             } else {
                 return firstRevCommit;
             }
