@@ -4,6 +4,7 @@ import com.example.viewer.dataClasses.FileModel;
 import com.example.viewer.dataClasses.FileFactory;
 import com.example.viewer.exceptions.DirsLookupException;
 import com.example.viewer.services.interfaces.DirsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -13,7 +14,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @Service
+@Slf4j
 public class DirsServiceImpl implements DirsService {
 
     public Optional<List<FileModel>> getFileModelList(String repositoriesPath, String workPath) {

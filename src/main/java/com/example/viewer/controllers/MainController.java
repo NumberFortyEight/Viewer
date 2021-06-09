@@ -7,6 +7,7 @@ import com.example.viewer.services.MainQueryService;
 import com.example.viewer.util.PathHelper;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +25,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MainController {
 
-    private final Map<String, Node> userAndNodeTree = new HashMap<>();
+    private final Map<String, Node> userAndURlsWithCommits = new HashMap<>();
     public final MainQueryService mainQueryService;
     public final JGitFacadeService jgitFacadeService;
 
     @GetMapping("/committree")
-    public Map<String, Node> getUserAndNodeTree(){
-        return userAndNodeTree;
+    public Map<String, Node> getUserAndURlsWithCommits(){
+        return userAndURlsWithCommits;
     }
 
     @GetMapping("api/{student}/{repository}/**")
@@ -38,10 +39,11 @@ public class MainController {
     public Object mainJGitApi(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String user = "One";
         String fullPath = PathHelper.getFullPath(request.getRequestURI());
-        Optional<String> OptionalQuery = Optional.ofNullable(request.getQueryString());
-        OptionalQuery.ifPresent(query -> mainQueryService.queryLogic(user, fullPath, query, userAndNodeTree));
 
-        Content content = jgitFacadeService.getContent(user, fullPath, userAndNodeTree);
+        Optional<String> OptionalQuery = Optional.ofNullable(request.getQueryString());
+        OptionalQuery.ifPresent(query -> mainQueryService.queryLogic(user, fullPath, query, userAndURlsWithCommits));
+
+        Content content = jgitFacadeService.getContent(user, fullPath, userAndURlsWithCommits);
         switch (content.getContentType()){
             case IMAGE:
                 response.setContentType(MediaType.IMAGE_JPEG_VALUE);

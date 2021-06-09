@@ -1,58 +1,20 @@
 package com.example.viewer.dataClasses;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.eclipse.jgit.revwalk.RevCommit;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
-
-@JsonIgnoreProperties(value = { "parentNode" , "revCommit"})
+@Getter
+@Setter
+@AllArgsConstructor
 public class Node {
-    private String name = "";
-    private int commitTime;
-    private List<Node> childNodeList = new ArrayList<>();
-    private Node parentNode;
-    private RevCommit revCommit;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Node> getChildNodeList() {
-        return childNodeList;
-    }
-
-    public void setChildNodeList(List<Node> childNodeList) {
-        this.childNodeList = childNodeList;
-    }
-
-    public Node getParentNode() {
-        return parentNode;
-    }
-
-    public void setParentNode(Node parentNode) {
-        this.parentNode = parentNode;
-    }
-
-    public RevCommit getRevCommit() {
-        return revCommit;
-    }
-
-    public int getCommitTime() {
-        return commitTime;
-    }
-
-    public void setCommitTime(int commitTime) {
-        this.commitTime = commitTime;
-    }
-
-    public void setRevCommit(RevCommit revCommit) {
-        this.revCommit = revCommit;
-        this.commitTime = revCommit.getCommitTime();
-    }
+    private String author;
+    private String repositoryName;
+    private HashMap<String, RevCommit> exclusion;
+    private RevCommit mainCommit;
 }
+
+
