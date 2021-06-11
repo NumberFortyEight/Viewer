@@ -7,7 +7,6 @@ import com.example.viewer.services.MainQueryService;
 import com.example.viewer.util.PathHelper;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +24,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MainController {
 
-    private final Map<String, Node> userAndURlsWithCommits = new HashMap<>();
+    private final Map<String, Node> userAndNode = new HashMap<>();
     public final MainQueryService mainQueryService;
     public final JGitFacadeService jgitFacadeService;
 
     @GetMapping("/committree")
-    public Map<String, Node> getUserAndURlsWithCommits(){
-        return userAndURlsWithCommits;
+    public Map<String, Node> getUserAndNode(){
+        return userAndNode;
     }
 
     @GetMapping("api/{student}/{repository}/**")
@@ -41,9 +40,9 @@ public class MainController {
         String fullPath = PathHelper.getFullPath(request.getRequestURI());
 
         Optional<String> OptionalQuery = Optional.ofNullable(request.getQueryString());
-        OptionalQuery.ifPresent(query -> mainQueryService.queryLogic(user, fullPath, query, userAndURlsWithCommits));
+        OptionalQuery.ifPresent(query -> mainQueryService.queryLogic(user, fullPath, query, userAndNode));
 
-        Content content = jgitFacadeService.getContent(user, fullPath, userAndURlsWithCommits);
+        Content content = jgitFacadeService.getContent(user, fullPath, userAndNode);
         switch (content.getContentType()){
             case IMAGE:
                 response.setContentType(MediaType.IMAGE_JPEG_VALUE);
